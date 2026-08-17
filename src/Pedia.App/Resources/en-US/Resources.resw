@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="AppTitle.Text" xml:space="preserve"><value>Pedia</value></data>
+  <data name="NewMenuButton.AutomationProperties.Name" xml:space="preserve"><value>New</value></data>
+  <data name="NewMenuButtonLabel.Text" xml:space="preserve"><value>New</value></data>
+  <data name="NewArticleMenuItem.Text" xml:space="preserve"><value>New article</value></data>
+  <data name="NewRootTopicMenuItem.Text" xml:space="preserve"><value>New root topic</value></data>
+  <data name="NewChildTopicMenuItem.Text" xml:space="preserve"><value>New child topic</value></data>
+  <data name="ImportButton.AutomationProperties.Name" xml:space="preserve"><value>Import local files</value></data>
+  <data name="ImportButtonLabel.Text" xml:space="preserve"><value>Import</value></data>
+  <data name="RefreshButton.Text" xml:space="preserve"><value>Refresh</value></data>
+  <data name="SettingsButton.Text" xml:space="preserve"><value>Settings</value></data>
+  <data name="ExpandTopicPaneButton.AutomationProperties.Name" xml:space="preserve"><value>Show topic pane</value></data>
+  <data name="ExpandTopicPaneButton.ToolTipService.ToolTip" xml:space="preserve"><value>Show topic pane</value></data>
+  <data name="ImportInProgressText.Text" xml:space="preserve"><value>Import in progress</value></data>
+  <data name="CancelImportButton.AutomationProperties.Name" xml:space="preserve"><value>Cancel import</value></data>
+  <data name="CancelImportButton.Content" xml:space="preserve"><value>Cancel</value></data>
+
+  <data name="TopicsHeader.Text" xml:space="preserve"><value>Topics</value></data>
+  <data name="AddTopicButton.AutomationProperties.Name" xml:space="preserve"><value>Add topic</value></data>
+  <data name="AddTopicButton.ToolTipService.ToolTip" xml:space="preserve"><value>Add topic (Ctrl+Shift+N)</value></data>
+  <data name="TopicMenuButton.AutomationProperties.Name" xml:space="preserve"><value>Topic commands</value></data>
+  <data name="TopicMenuButton.ToolTipService.ToolTip" xml:space="preserve"><value>Topic commands</value></data>
+  <data name="TopicFilterBox.PlaceholderText" xml:space="preserve"><value>Filter topics</value></data>
+  <data name="TopicFilterBox.AutomationProperties.Name" xml:space="preserve"><value>Filter topics</value></data>
+  <data name="AllArticlesNode" xml:space="preserve"><value>All articles</value></data>
+  <data name="FavoritesNode" xml:space="preserve"><value>Favorites</value></data>
+  <data name="RecentlyEditedNode" xml:space="preserve"><value>Recently edited</value></data>
+  <data name="UncategorizedNode" xml:space="preserve"><value>Uncategorized</value></data>
+  <data name="TrashNode" xml:space="preserve"><value>Trash</value></data>
+  <data name="RenameTopicMenuItem.Text" xml:space="preserve"><value>Rename</value></data>
+  <data name="MoveTopicMenuItem.Text" xml:space="preserve"><value>Move topic</value></data>
+  <data name="MoveTopicUpMenuItem.Text" xml:space="preserve"><value>Move up</value></data>
+  <data name="MoveTopicDownMenuItem.Text" xml:space="preserve"><value>Move down</value></data>
+  <data name="CopyTopicPathMenuItem.Text" xml:space="preserve"><value>Copy path</value></data>
+  <data name="DeleteTopicMenuItem.Text" xml:space="preserve"><value>Delete topic</value></data>
+  <data name="ExpandTopicsMenuItem.Text" xml:space="preserve"><value>Expand all</value></data>
+  <data name="CollapseTopicsMenuItem.Text" xml:space="preserve"><value>Collapse all</value></data>
+  <data name="TopicTree.AutomationProperties.Name" xml:space="preserve"><value>Topics</value></data>
+  <data name="CollapseTopicPaneButton.AutomationProperties.Name" xml:space="preserve"><value>Collapse topic pane</value></data>
+  <data name="CollapseTopicPaneButton.ToolTipService.ToolTip" xml:space="preserve"><value>Collapse topic pane</value></data>
+  <data name="CollapseTopicPaneButtonLabel.Text" xml:space="preserve"><value>Collapse</value></data>
+  <data name="PaneSplitter.AutomationProperties.Name" xml:space="preserve"><value>Resize panes</value></data>
+
+  <data name="SearchBox.PlaceholderText" xml:space="preserve"><value>Search all articles</value></data>
+  <data name="SearchBox.AutomationProperties.Name" xml:space="preserve"><value>Search articles</value></data>
+  <data name="SearchFiltersButton.AutomationProperties.Name" xml:space="preserve"><value>Search and filter options</value></data>
+  <data name="SearchFiltersButton.ToolTipService.ToolTip" xml:space="preserve"><value>Search and filter options</value></data>
+  <data name="SearchScopeLabel.Header" xml:space="preserve"><value>Search scope</value></data>
+  <data name="LanguagesFilterLabel.Text" xml:space="preserve"><value>Languages</value></data>
+  <data name="IncludeEnglishCheckBox.Content" xml:space="preserve"><value>English</value></data>
+  <data name="IncludeFinnishCheckBox.Content" xml:space="preserve"><value>Finnish</value></data>
+  <data name="FavoritesOnlyCheckBox.Content" xml:space="preserve"><value>Favorites only</value></data>
+  <data name="SourceMetadataFilter.Header" xml:space="preserve"><value>Source metadata</value></data>
+  <data name="MinimumWordsFilter.Header" xml:space="preserve"><value>Minimum words</value></data>
+  <data name="MaximumWordsFilter.Header" xml:space="preserve"><value>Maximum words</value></data>
+  <data name="CreatedFromFilter.Header" xml:space="preserve"><value>Created from</value></data>
+  <data name="CreatedToFilter.Header" xml:space="preserve"><value>Created to</value></data>
+  <data name="UpdatedFromFilter.Header" xml:space="preserve"><value>Updated from</value></data>
+  <data name="UpdatedToFilter.Header" xml:space="preserve"><value>Updated to</value></data>
+  <data name="ArchivedStateFilter.Header" xml:space="preserve"><value>Archived state</value></data>
+  <data name="SampleContentFilter.Header" xml:space="preserve"><value>Sample content</value></data>
+  <data name="AllTextSearchScope" xml:space="preserve"><value>All article text</value></data>
+  <data name="TitleOnlySearchScope" xml:space="preserve"><value>Title only</value></data>
+  <data name="EntireLibrarySearchScope" xml:space="preserve"><value>Entire library</value></data>
+  <data name="CurrentTopicSearchScope" xml:space="preserve"><value>Current topic</value></data>
+  <data name="LanguageFilter.AutomationProperties.Name" xml:space="preserve"><value>Language filter</value></data>
+  <data name="AllLanguagesOption" xml:space="preserve"><value>All languages</value></data>
+  <data name="EnglishOption" xml:space="preserve"><value>English</value></data>
+  <data name="FinnishOption" xml:space="preserve"><value>Finnish</value></data>
+  <data name="TypeFilter.AutomationProperties.Name" xml:space="preserve"><value>Article type filter</value></data>
+  <data name="AllTypesOption" xml:space="preserve"><value>All types</value></data>
+  <data name="StatusFilter.AutomationProperties.Name" xml:space="preserve"><value>Article status filter</value></data>
+  <data name="AnyStatusOption" xml:space="preserve"><value>Any status</value></data>
+  <data name="ClearFiltersButton.Content" xml:space="preserve"><value>Clear</value></data>
+  <data name="IncludeSubtopicsCheckBox.Content" xml:space="preserve"><value>Include subtopics</value></data>
+  <data name="ArticleColumnButton.Text" xml:space="preserve"><value>Article</value></data>
+  <data name="LanguageColumnButton.Text" xml:space="preserve"><value>Language</value></data>
+  <data name="WordsColumnButton.Text" xml:space="preserve"><value>Words</value></data>
+  <data name="StatusColumnButton.Text" xml:space="preserve"><value>Status</value></data>
+  <data name="UpdatedColumnButton.Text" xml:space="preserve"><value>Updated</value></data>
+  <data name="ArticleList.AutomationProperties.Name" xml:space="preserve"><value>Articles</value></data>
+  <data name="OpenArticleMenuItem.Text" xml:space="preserve"><value>Open</value></data>
+  <data name="EditArticleMenuItem.Text" xml:space="preserve"><value>Edit</value></data>
+  <data name="DuplicateArticleMenuItem.Text" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="AddArticleToTopicsMenuItem.Text" xml:space="preserve"><value>Add to topics</value></data>
+  <data name="RemoveArticleFromTopicMenuItem.Text" xml:space="preserve"><value>Remove from current topic</value></data>
+  <data name="FavoriteArticleMenuItem.Text" xml:space="preserve"><value>Toggle favorite</value></data>
+  <data name="ExportArticleMenuItem.Text" xml:space="preserve"><value>Export</value></data>
+  <data name="TrashArticleMenuItem.Text" xml:space="preserve"><value>Move to Trash</value></data>
+  <data name="RestoreArticleMenuItem.Text" xml:space="preserve"><value>Restore</value></data>
+  <data name="DeleteForeverArticleMenuItem.Text" xml:space="preserve"><value>Delete permanently</value></data>
+  <data name="FirstPageButton.AutomationProperties.Name" xml:space="preserve"><value>First page</value></data>
+  <data name="FirstPageButton.ToolTipService.ToolTip" xml:space="preserve"><value>First page</value></data>
+  <data name="PreviousPageButton.AutomationProperties.Name" xml:space="preserve"><value>Previous page</value></data>
+  <data name="PreviousPageButton.ToolTipService.ToolTip" xml:space="preserve"><value>Previous page</value></data>
+  <data name="NextPageButton.AutomationProperties.Name" xml:space="preserve"><value>Next page</value></data>
+  <data name="NextPageButton.ToolTipService.ToolTip" xml:space="preserve"><value>Next page</value></data>
+  <data name="LastPageButton.AutomationProperties.Name" xml:space="preserve"><value>Last page</value></data>
+  <data name="LastPageButton.ToolTipService.ToolTip" xml:space="preserve"><value>Last page</value></data>
+  <data name="PageSizeBox.AutomationProperties.Name" xml:space="preserve"><value>Articles per page</value></data>
+  <data name="NoArticlesText.Text" xml:space="preserve"><value>No articles match the current scope.</value></data>
+  <data name="EmptyTrashButton.Content" xml:space="preserve"><value>Empty Trash</value></data>
+  <data name="PerPageText.Text" xml:space="preserve"><value>Per page</value></data>
+
+  <data name="ReadTab.Header" xml:space="preserve"><value>Read</value></data>
+  <data name="MetadataTab.Header" xml:space="preserve"><value>Metadata</value></data>
+  <data name="SourceTab.Header" xml:space="preserve"><value>Source</value></data>
+  <data name="TopicsTab.Header" xml:space="preserve"><value>Topics</value></data>
+  <data name="ArticleActionsButton.AutomationProperties.Name" xml:space="preserve"><value>Article actions</value></data>
+  <data name="ArticleActionsButton.ToolTipService.ToolTip" xml:space="preserve"><value>Article actions</value></data>
+  <data name="SelectArticleEmptyState.Text" xml:space="preserve"><value>Select an article to read it.</value></data>
+  <data name="EditButton.Text" xml:space="preserve"><value>Edit</value></data>
+  <data name="FavoriteButton.Text" xml:space="preserve"><value>Favorite</value></data>
+  <data name="ExportButton.Content" xml:space="preserve"><value>Export</value></data>
+  <data name="MoveToTrashButton.Content" xml:space="preserve"><value>Move to Trash</value></data>
+  <data name="RestoreButton.Content" xml:space="preserve"><value>Restore</value></data>
+  <data name="DeleteForeverButton.Content" xml:space="preserve"><value>Delete permanently</value></data>
+  <data name="TitleLabel.Text" xml:space="preserve"><value>Title</value></data>
+  <data name="SubtitleLabel.Text" xml:space="preserve"><value>Subtitle</value></data>
+  <data name="SummaryLabel.Text" xml:space="preserve"><value>Summary</value></data>
+  <data name="LanguageLabel.Text" xml:space="preserve"><value>Language</value></data>
+  <data name="TypeLabel.Text" xml:space="preserve"><value>Type</value></data>
+  <data name="StatusLabel.Text" xml:space="preserve"><value>Status</value></data>
+  <data name="FavoriteLabel.Text" xml:space="preserve"><value>Favorite</value></data>
+  <data name="WordCountLabel.Text" xml:space="preserve"><value>Word count</value></data>
+  <data name="CreatedLabel.Text" xml:space="preserve"><value>Created</value></data>
+  <data name="UpdatedLabel.Text" xml:space="preserve"><value>Updated</value></data>
+  <data name="InternalIdLabel.Text" xml:space="preserve"><value>Internal article ID</value></data>
+  <data name="NotesLabel.Text" xml:space="preserve"><value>Notes</value></data>
+  <data name="NoSourcesText.Text" xml:space="preserve"><value>No source metadata.</value></data>
+  <data name="NoTopicsText.Text" xml:space="preserve"><value>This article is uncategorized.</value></data>
+  <data name="OpenSourceButton.Content" xml:space="preserve"><value>Open URL</value></data>
+  <data name="CopySourceButton.Content" xml:space="preserve"><value>Copy URL</value></data>
+  <data name="PrimaryTopicText.Text" xml:space="preserve"><value>Primary topic</value></data>
+  <data name="ManageTopicsButton.AutomationProperties.Name" xml:space="preserve"><value>Manage topic assignments</value></data>
+  <data name="ManageTopicsButton.Content" xml:space="preserve"><value>Manage topics</value></data>
+  <data name="ManageTopicsButton.ToolTipService.ToolTip" xml:space="preserve"><value>Add or remove topic assignments</value></data>
+  <data name="ReaderPrimaryTopicButton.AutomationProperties.Name" xml:space="preserve"><value>Set as primary topic</value></data>
+  <data name="ReaderPrimaryTopicButton.Content" xml:space="preserve"><value>Primary</value></data>
+  <data name="ReaderRemoveTopicAssignmentButton.AutomationProperties.Name" xml:space="preserve"><value>Remove topic assignment</value></data>
+  <data name="ReaderRemoveTopicAssignmentButton.ToolTipService.ToolTip" xml:space="preserve"><value>Remove topic assignment</value></data>
+
+  <data name="EditArticleHeader.Text" xml:space="preserve"><value>Edit article</value></data>
+  <data name="NewArticleHeader.Text" xml:space="preserve"><value>New article</value></data>
+  <data name="TitleField.Header" xml:space="preserve"><value>Title</value></data>
+  <data name="SubtitleField.Header" xml:space="preserve"><value>Subtitle</value></data>
+  <data name="SummaryField.Header" xml:space="preserve"><value>Summary</value></data>
+  <data name="LanguageField.Header" xml:space="preserve"><value>Language code</value></data>
+  <data name="ArticleTypeField.Header" xml:space="preserve"><value>Article type</value></data>
+  <data name="ArticleStatusField.Header" xml:space="preserve"><value>Status</value></data>
+  <data name="NotesField.Header" xml:space="preserve"><value>Notes</value></data>
+  <data name="FavoriteField.Content" xml:space="preserve"><value>Favorite</value></data>
+  <data name="SectionsHeader.Text" xml:space="preserve"><value>Sections</value></data>
+  <data name="AddSectionButton.Content" xml:space="preserve"><value>Add section</value></data>
+  <data name="SectionHeadingField.Header" xml:space="preserve"><value>Heading</value></data>
+  <data name="SectionLevelField.Header" xml:space="preserve"><value>Heading level</value></data>
+  <data name="SectionBodyField.Header" xml:space="preserve"><value>Body</value></data>
+  <data name="MoveSectionUpButton.AutomationProperties.Name" xml:space="preserve"><value>Move section up</value></data>
+  <data name="MoveSectionUpButton.ToolTipService.ToolTip" xml:space="preserve"><value>Move section up</value></data>
+  <data name="MoveSectionDownButton.AutomationProperties.Name" xml:space="preserve"><value>Move section down</value></data>
+  <data name="MoveSectionDownButton.ToolTipService.ToolTip" xml:space="preserve"><value>Move section down</value></data>
+  <data name="DeleteSectionButton.AutomationProperties.Name" xml:space="preserve"><value>Delete section</value></data>
+  <data name="DeleteSectionButton.ToolTipService.ToolTip" xml:space="preserve"><value>Delete section</value></data>
+  <data name="SourcesHeader.Text" xml:space="preserve"><value>Sources</value></data>
+  <data name="AddSourceButton.Content" xml:space="preserve"><value>Add source</value></data>
+  <data name="SourceTypeField.Header" xml:space="preserve"><value>Source type</value></data>
+  <data name="SourceTitleField.Header" xml:space="preserve"><value>Source title</value></data>
+  <data name="SourceUrlField.Header" xml:space="preserve"><value>URL</value></data>
+  <data name="SourceNotesField.Header" xml:space="preserve"><value>Notes</value></data>
+  <data name="DeleteSourceButton.AutomationProperties.Name" xml:space="preserve"><value>Remove source</value></data>
+  <data name="DeleteSourceButton.ToolTipService.ToolTip" xml:space="preserve"><value>Remove source</value></data>
+  <data name="MoveSourceUpButton.AutomationProperties.Name" xml:space="preserve"><value>Move source up</value></data>
+  <data name="MoveSourceUpButton.ToolTipService.ToolTip" xml:space="preserve"><value>Move source up</value></data>
+  <data name="MoveSourceDownButton.AutomationProperties.Name" xml:space="preserve"><value>Move source down</value></data>
+  <data name="MoveSourceDownButton.ToolTipService.ToolTip" xml:space="preserve"><value>Move source down</value></data>
+  <data name="ExternalPageIdField.Header" xml:space="preserve"><value>External page ID</value></data>
+  <data name="ExternalRevisionIdField.Header" xml:space="preserve"><value>External revision ID</value></data>
+  <data name="LicenseField.Header" xml:space="preserve"><value>License</value></data>
+  <data name="AttributionField.Header" xml:space="preserve"><value>Attribution</value></data>
+  <data name="RetrievedField.Header" xml:space="preserve"><value>Retrieved</value></data>
+  <data name="LastCheckedField.Header" xml:space="preserve"><value>Last checked</value></data>
+  <data name="AssignedTopicsHeader.Text" xml:space="preserve"><value>Assigned topics</value></data>
+  <data name="AddTopicsButton.Content" xml:space="preserve"><value>Add topics</value></data>
+  <data name="RemoveTopicAssignmentButton.AutomationProperties.Name" xml:space="preserve"><value>Remove topic assignment</value></data>
+  <data name="RemoveTopicAssignmentButton.ToolTipService.ToolTip" xml:space="preserve"><value>Remove topic assignment</value></data>
+  <data name="EditorPrimaryTopicButton.Content" xml:space="preserve"><value>Primary</value></data>
+  <data name="SaveArticleButton.Content" xml:space="preserve"><value>Save</value></data>
+  <data name="CancelEditButton.Content" xml:space="preserve"><value>Cancel</value></data>
+
+  <data name="SettingsHeader.Text" xml:space="preserve"><value>Settings</value></data>
+  <data name="BackButton.Text" xml:space="preserve"><value>Back</value></data>
+  <data name="GeneralSettingsHeader.Text" xml:space="preserve"><value>General</value></data>
+  <data name="ReadingSettingsHeader.Text" xml:space="preserve"><value>Reading</value></data>
+  <data name="AppearanceSettingsHeader.Text" xml:space="preserve"><value>Appearance</value></data>
+  <data name="DataSettingsHeader.Text" xml:space="preserve"><value>Data</value></data>
+  <data name="AboutSettingsHeader.Text" xml:space="preserve"><value>About</value></data>
+  <data name="DefaultLanguageField.Header" xml:space="preserve"><value>Default article language</value></data>
+  <data name="DefaultStatusField.Header" xml:space="preserve"><value>Default article status</value></data>
+  <data name="RestoreSelectionField.Content" xml:space="preserve"><value>Restore last selected article on startup</value></data>
+  <data name="ConfirmTrashField.Content" xml:space="preserve"><value>Confirm before moving articles to Trash</value></data>
+  <data name="DefaultIncludeSubtopicsField.Content" xml:space="preserve"><value>Include subtopics by default</value></data>
+  <data name="PageSizeField.Header" xml:space="preserve"><value>Articles per page</value></data>
+  <data name="BodyFontSizeField.Header" xml:space="preserve"><value>Article body font size</value></data>
+  <data name="LineSpacingField.Header" xml:space="preserve"><value>Article line spacing</value></data>
+  <data name="MaximumReadingWidthField.Header" xml:space="preserve"><value>Maximum reading width</value></data>
+  <data name="RememberScrollField.Content" xml:space="preserve"><value>Remember article scroll positions</value></data>
+  <data name="DensityField.Header" xml:space="preserve"><value>Density</value></data>
+  <data name="DensitySwitch.Header" xml:space="preserve"><value>Density</value></data>
+  <data name="DensitySwitch.OffContent" xml:space="preserve"><value>Comfortable</value></data>
+  <data name="DensitySwitch.OnContent" xml:space="preserve"><value>Compact</value></data>
+  <data name="CompactOption" xml:space="preserve"><value>Compact</value></data>
+  <data name="ComfortableOption" xml:space="preserve"><value>Comfortable</value></data>
+  <data name="ThemeInformation.Text" xml:space="preserve"><value>Pedia uses a monochrome dark theme. System accent colors are not used.</value></data>
+  <data name="DatabasePathLabel.Text" xml:space="preserve"><value>Database path</value></data>
+  <data name="DatabaseSizeLabel.Text" xml:space="preserve"><value>Database size</value></data>
+  <data name="SchemaVersionLabel.Text" xml:space="preserve"><value>Schema version</value></data>
+  <data name="ArticleCountLabel.Text" xml:space="preserve"><value>Articles</value></data>
+  <data name="TopicCountLabel.Text" xml:space="preserve"><value>Topics</value></data>
+  <data name="SourceCountLabel.Text" xml:space="preserve"><value>Sources</value></data>
+  <data name="SearchIndexLabel.Text" xml:space="preserve"><value>Search index</value></data>
+  <data name="OpenDataFolderButton.Content" xml:space="preserve"><value>Open data folder</value></data>
+  <data name="BackupNowButton.Content" xml:space="preserve"><value>Back up now</value></data>
+  <data name="RestoreBackupButton.Content" xml:space="preserve"><value>Restore backup</value></data>
+  <data name="RebuildIndexButton.Content" xml:space="preserve"><value>Rebuild search index</value></data>
+  <data name="DeleteSampleContentButton.Content" xml:space="preserve"><value>Delete sample content</value></data>
+  <data name="SaveSettingsButton.Content" xml:space="preserve"><value>Save settings</value></data>
+  <data name="AboutTitle.Text" xml:space="preserve"><value>Pedia</value></data>
+  <data name="AboutDescription.Text" xml:space="preserve"><value>Local knowledge library</value></data>
+  <data name="PrivacyText.Text" xml:space="preserve"><value>Normal library operations remain on this device. Pedia does not fetch online articles or send telemetry.</value></data>
+  <data name="ThirdPartyComponentsText.Text" xml:space="preserve"><value>CommunityToolkit.Mvvm, Microsoft.Data.Sqlite, Microsoft.Extensions.DependencyInjection, Microsoft.WindowsAppSDK</value></data>
+
+  <data name="DatabaseReadyText" xml:space="preserve"><value>Database ready</value></data>
+  <data name="SearchIndexReadyText" xml:space="preserve"><value>Search index ready</value></data>
+  <data name="SearchIndexNeedsRebuildingText" xml:space="preserve"><value>Search index needs rebuilding</value></data>
+  <data name="Fts5UnavailableText" xml:space="preserve"><value>This SQLite installation does not provide the FTS5 search module required by Pedia.</value></data>
+  <data name="MarkdownFormatText" xml:space="preserve"><value>Markdown</value></data>
+  <data name="PlainTextFormatText" xml:space="preserve"><value>Plain text</value></data>
+  <data name="ArticleNotFoundFormat" xml:space="preserve"><value>Article {0} was not found.</value></data>
+  <data name="ArticleRowAccessibleNameFormat" xml:space="preserve"><value>{0}, {1}, {2:N0} words, {3}, updated {4:g}</value></data>
+  <data name="TopicAccessibleNameFormat" xml:space="preserve"><value>{0}, {1:N0} articles</value></data>
+  <data name="UnknownStatus" xml:space="preserve"><value>Unknown status</value></data>
+  <data name="ExportSelectedButton.Content" xml:space="preserve"><value>Export selected</value></data>
+  <data name="ExportSelectedButton.AutomationProperties.Name" xml:space="preserve"><value>Export selected articles</value></data>
+  <data name="ArticlesExportedFormat" xml:space="preserve"><value>{0:N0} articles exported.</value></data>
+  <data name="ExportSuggestedFileName" xml:space="preserve"><value>Pedia article</value></data>
+  <data name="MarkdownFileTypeDescription" xml:space="preserve"><value>Markdown document</value></data>
+  <data name="PediaJsonFileTypeDescription" xml:space="preserve"><value>Pedia JSON document</value></data>
+  <data name="PlainTextFileTypeDescription" xml:space="preserve"><value>Plain text document</value></data>
+  <data name="PediaBackupFileTypeDescription" xml:space="preserve"><value>Pedia backup</value></data>
+  <data name="FilePickerWindowUnavailableText" xml:space="preserve"><value>The file picker is not attached to the Pedia window.</value></data>
+  <data name="LoadingText" xml:space="preserve"><value>Loading library</value></data>
+  <data name="ArticlesCountFormat" xml:space="preserve"><value>{0:N0} articles</value></data>
+  <data name="TopicsCountFormat" xml:space="preserve"><value>{0:N0} topics</value></data>
+  <data name="ResultsCountFormat" xml:space="preserve"><value>{0:N0} results</value></data>
+  <data name="PageRangeFormat" xml:space="preserve"><value>{0:N0}–{1:N0} of {2:N0}</value></data>
+  <data name="LastImportFormat" xml:space="preserve"><value>Last import: {0:g}</value></data>
+  <data name="NoImportsText" xml:space="preserve"><value>No imports yet</value></data>
+  <data name="WordsFormat" xml:space="preserve"><value>{0:N0} words</value></data>
+  <data name="TopicsAssignedFormat" xml:space="preserve"><value>{0:N0} topics</value></data>
+  <data name="SourcesAssignedFormat" xml:space="preserve"><value>{0:N0} sources</value></data>
+  <data name="UpdatedFormat" xml:space="preserve"><value>Updated {0:g}</value></data>
+
+  <data name="ErrorTitle" xml:space="preserve"><value>Pedia could not complete the operation</value></data>
+  <data name="OperationFailedMessage" xml:space="preserve"><value>Pedia could not complete the operation. Technical details were written to the local log.</value></data>
+  <data name="CloseButtonText" xml:space="preserve"><value>Close</value></data>
+  <data name="CancelButtonText" xml:space="preserve"><value>Cancel</value></data>
+  <data name="SaveButtonText" xml:space="preserve"><value>Save</value></data>
+  <data name="DiscardButtonText" xml:space="preserve"><value>Discard</value></data>
+  <data name="ContinueButtonText" xml:space="preserve"><value>Continue</value></data>
+  <data name="DeleteButtonText" xml:space="preserve"><value>Delete</value></data>
+  <data name="RestoreButtonText" xml:space="preserve"><value>Restore</value></data>
+  <data name="ImportButtonText" xml:space="preserve"><value>Import</value></data>
+  <data name="TopicNameRequiredText" xml:space="preserve"><value>Enter a topic name.</value></data>
+  <data name="ArticleTitleRequiredText" xml:space="preserve"><value>Enter an article title.</value></data>
+  <data name="ArticleSavedText" xml:space="preserve"><value>Article saved.</value></data>
+  <data name="ArticleTrashedText" xml:space="preserve"><value>Article moved to Trash.</value></data>
+  <data name="ArticleRestoredText" xml:space="preserve"><value>Article restored.</value></data>
+  <data name="BackupCreatedText" xml:space="preserve"><value>Backup created.</value></data>
+  <data name="BackupRestoredText" xml:space="preserve"><value>Backup restored.</value></data>
+  <data name="SearchIndexRebuiltText" xml:space="preserve"><value>Search index rebuilt.</value></data>
+  <data name="SettingsSavedText" xml:space="preserve"><value>Settings saved.</value></data>
+  <data name="UnsavedChangesTitle" xml:space="preserve"><value>Unsaved changes</value></data>
+  <data name="UnsavedChangesMessage" xml:space="preserve"><value>Save or discard the current article changes before continuing.</value></data>
+  <data name="MoveToTrashTitle" xml:space="preserve"><value>Move article to Trash?</value></data>
+  <data name="MoveToTrashMessage" xml:space="preserve"><value>The article can be restored from Trash.</value></data>
+  <data name="PermanentDeleteTitle" xml:space="preserve"><value>Delete article permanently?</value></data>
+  <data name="PermanentDeleteMessage" xml:space="preserve"><value>This removes the article and its sections, sources, and topic assignments. This cannot be undone.</value></data>
+  <data name="DeleteTopicTitle" xml:space="preserve"><value>Delete topic?</value></data>
+  <data name="DeleteTopicMessage" xml:space="preserve"><value>Child topics will move to this topic's parent. Article assignments to this topic will be removed, but articles will remain.</value></data>
+  <data name="RestoreBackupTitle" xml:space="preserve"><value>Restore this backup?</value></data>
+  <data name="RestoreBackupMessage" xml:space="preserve"><value>Pedia will first create a safety backup, then replace the current local database.</value></data>
+  <data name="DeleteSamplesTitle" xml:space="preserve"><value>Delete sample content?</value></data>
+  <data name="DeleteSamplesMessage" xml:space="preserve"><value>Only records still marked as sample content will be removed.</value></data>
+  <data name="ImportCompleteFormat" xml:space="preserve"><value>{0:N0} files imported, {1:N0} skipped, {2:N0} failed.</value></data>
+
+  <data name="CurrentTopicDescendantsSearchScope" xml:space="preserve"><value>Current topic and descendants</value></data>
+  <data name="AnySourceStateOption" xml:space="preserve"><value>Any source state</value></data>
+  <data name="HasSourceMetadataOption" xml:space="preserve"><value>Has source metadata</value></data>
+  <data name="NoSourceMetadataOption" xml:space="preserve"><value>No source metadata</value></data>
+  <data name="AnyArchivedStateOption" xml:space="preserve"><value>Any archived state</value></data>
+  <data name="ArchivedOnlyOption" xml:space="preserve"><value>Archived only</value></data>
+  <data name="ExcludeArchivedOption" xml:space="preserve"><value>Exclude archived</value></data>
+  <data name="AnyContentOption" xml:space="preserve"><value>Any content</value></data>
+  <data name="SampleContentOnlyOption" xml:space="preserve"><value>Sample content only</value></data>
+  <data name="UserContentOnlyOption" xml:space="preserve"><value>User content only</value></data>
+  <data name="SearchFavoritesPlaceholder" xml:space="preserve"><value>Search favorites</value></data>
+  <data name="SearchInTopicFormat" xml:space="preserve"><value>Search in {0}</value></data>
+  <data name="SearchAllArticlesPlaceholder" xml:space="preserve"><value>Search all articles</value></data>
+  <data name="NoActiveFiltersText" xml:space="preserve"><value>No active filters</value></data>
+  <data name="ActiveFiltersFormat" xml:space="preserve"><value>{0:N0} active filters</value></data>
+
+  <data name="DatabaseNotInitializedText" xml:space="preserve"><value>Database not initialized</value></data>
+  <data name="SearchIndexNotInitializedText" xml:space="preserve"><value>Search index not initialized</value></data>
+  <data name="OpeningDatabaseText" xml:space="preserve"><value>Opening database</value></data>
+  <data name="PreparingSearchIndexText" xml:space="preserve"><value>Preparing search index</value></data>
+  <data name="DatabaseUnavailableText" xml:space="preserve"><value>Database unavailable</value></data>
+  <data name="SearchIndexUnavailableText" xml:space="preserve"><value>Search index unavailable</value></data>
+  <data name="ImportErrorsTitle" xml:space="preserve"><value>Import errors</value></data>
+  <data name="ImportCancelledText" xml:space="preserve"><value>Import cancelled.</value></data>
+  <data name="EmptyTrashTitle" xml:space="preserve"><value>Empty Trash</value></data>
+  <data name="EmptyTrashMessage" xml:space="preserve"><value>Permanently delete every article in Trash? This cannot be undone.</value></data>
+  <data name="TrashEmptiedText" xml:space="preserve"><value>Trash emptied.</value></data>
+  <data name="TopicAssignmentsUpdatedText" xml:space="preserve"><value>Topic assignments updated.</value></data>
+  <data name="ArticleRemovedFromTopicText" xml:space="preserve"><value>Article removed from topic.</value></data>
+  <data name="PrimaryTopicUpdatedText" xml:space="preserve"><value>Primary topic updated.</value></data>
+  <data name="ArticleExportedText" xml:space="preserve"><value>Article exported.</value></data>
+  <data name="MoveToTrashButtonText" xml:space="preserve"><value>Move to Trash</value></data>
+
+  <data name="NameFieldHeader" xml:space="preserve"><value>Name</value></data>
+  <data name="DescriptionFieldHeader" xml:space="preserve"><value>Description</value></data>
+  <data name="SearchTopicsPlaceholder" xml:space="preserve"><value>Search topics</value></data>
+  <data name="SearchTopicsByPathPlaceholder" xml:space="preserve"><value>Search topics by full path</value></data>
+  <data name="AssignTopicsTitle" xml:space="preserve"><value>Assign topics</value></data>
+  <data name="DestinationTopicHeader" xml:space="preserve"><value>Destination topic</value></data>
+  <data name="UncategorizedOption" xml:space="preserve"><value>Uncategorized</value></data>
+  <data name="LanguageCodeHeader" xml:space="preserve"><value>Language code</value></data>
+  <data name="InitialStatusHeader" xml:space="preserve"><value>Initial status</value></data>
+  <data name="DuplicateHandlingHeader" xml:space="preserve"><value>When a title already exists</value></data>
+  <data name="ImportPreviewTitle" xml:space="preserve"><value>Import preview</value></data>
+  <data name="FileColumnText" xml:space="preserve"><value>File</value></data>
+  <data name="TypeColumnText" xml:space="preserve"><value>Type</value></data>
+  <data name="TitleColumnText" xml:space="preserve"><value>Title</value></data>
+  <data name="TargetColumnText" xml:space="preserve"><value>Target</value></data>
+  <data name="StatusColumnText" xml:space="preserve"><value>Status</value></data>
+  <data name="ConflictColumnText" xml:space="preserve"><value>Conflict</value></data>
+  <data name="ActionColumnText" xml:space="preserve"><value>Action</value></data>
+  <data name="ErrorColumnText" xml:space="preserve"><value>Error</value></data>
+  <data name="YesText" xml:space="preserve"><value>Yes</value></data>
+  <data name="NoText" xml:space="preserve"><value>No</value></data>
+  <data name="NoneText" xml:space="preserve"><value>None</value></data>
+  <data name="ImportActionText" xml:space="preserve"><value>Import</value></data>
+  <data name="CreateCopyActionText" xml:space="preserve"><value>Create copy</value></data>
+  <data name="ReplaceActionText" xml:space="preserve"><value>Replace</value></data>
+  <data name="SkipActionText" xml:space="preserve"><value>Skip</value></data>
+  <data name="FailedActionText" xml:space="preserve"><value>Failed</value></data>
+  <data name="ImportPreviewSummaryFormat" xml:space="preserve"><value>{0:N0} files: {1:N0} import, {2:N0} create copy, {3:N0} replace, {4:N0} skip, {5:N0} failed.</value></data>
+  <data name="ConfirmReplacementTitle" xml:space="preserve"><value>Confirm replacement</value></data>
+  <data name="ConfirmReplacementMessage" xml:space="preserve"><value>Existing articles with matching titles will be replaced by the imported content.</value></data>
+  <data name="ReplaceAndImportButtonText" xml:space="preserve"><value>Replace and import</value></data>
+
+  <data name="ExportFormatHeader" xml:space="preserve"><value>Export format</value></data>
+  <data name="PlainTextFormat" xml:space="preserve"><value>Plain text</value></data>
+  <data name="MarkdownFormat" xml:space="preserve"><value>Markdown</value></data>
+  <data name="PediaJsonFormat" xml:space="preserve"><value>Pedia JSON</value></data>
+  <data name="ExportArticleTitle" xml:space="preserve"><value>Export article</value></data>
+
+  <data name="GeneralArticleType" xml:space="preserve"><value>General</value></data>
+  <data name="PersonArticleType" xml:space="preserve"><value>Person</value></data>
+  <data name="PlaceArticleType" xml:space="preserve"><value>Place</value></data>
+  <data name="EventArticleType" xml:space="preserve"><value>Event</value></data>
+  <data name="ConceptArticleType" xml:space="preserve"><value>Concept</value></data>
+  <data name="OrganizationArticleType" xml:space="preserve"><value>Organization</value></data>
+  <data name="TimelineArticleType" xml:space="preserve"><value>Timeline</value></data>
+  <data name="OtherArticleType" xml:space="preserve"><value>Other</value></data>
+  <data name="DraftStatus" xml:space="preserve"><value>Draft</value></data>
+  <data name="ReadyStatus" xml:space="preserve"><value>Ready</value></data>
+  <data name="NeedsReviewStatus" xml:space="preserve"><value>Needs review</value></data>
+  <data name="ArchivedStatus" xml:space="preserve"><value>Archived</value></data>
+  <data name="SkipDuplicateOption" xml:space="preserve"><value>Skip</value></data>
+  <data name="CreateCopyDuplicateOption" xml:space="preserve"><value>Create a copy</value></data>
+  <data name="ReplaceDuplicateOption" xml:space="preserve"><value>Replace</value></data>
+  <data name="ImportDuplicateSkipOption" xml:space="preserve"><value>Skip</value></data>
+  <data name="ImportDuplicateCreateCopyOption" xml:space="preserve"><value>Create a copy</value></data>
+  <data name="ImportDuplicateReplaceOption" xml:space="preserve"><value>Replace</value></data>
+  <data name="ImportActionCreateCopy" xml:space="preserve"><value>Create copy</value></data>
+  <data name="ImportActionImport" xml:space="preserve"><value>Import</value></data>
+  <data name="ImportActionReplace" xml:space="preserve"><value>Replace</value></data>
+  <data name="ImportActionSkip" xml:space="preserve"><value>Skip</value></data>
+  <data name="ImportActionFailed" xml:space="preserve"><value>Failed</value></data>
+  <data name="ReplaceAndImportButton" xml:space="preserve"><value>Replace and import</value></data>
+  <data name="EditTopicTitle" xml:space="preserve"><value>Edit topic</value></data>
+  <data name="RootTopLevelOption" xml:space="preserve"><value>Root (top level)</value></data>
+  <data name="MoveTopicTitle" xml:space="preserve"><value>Move topic</value></data>
+  <data name="NewRootTopicTitle" xml:space="preserve"><value>New root topic</value></data>
+  <data name="NewChildTopicTitle" xml:space="preserve"><value>New child topic</value></data>
+  <data name="InvalidBackupMessage" xml:space="preserve"><value>The selected file is not a valid Pedia backup.</value></data>
+  <data name="SampleContentDeletedText" xml:space="preserve"><value>Sample content deleted.</value></data>
+  <data name="ManualSourceType" xml:space="preserve"><value>Manual</value></data>
+  <data name="LocalTextFileSourceType" xml:space="preserve"><value>Local text file</value></data>
+  <data name="LocalMarkdownFileSourceType" xml:space="preserve"><value>Local Markdown file</value></data>
+  <data name="BookSourceType" xml:space="preserve"><value>Book</value></data>
+  <data name="WebsiteSourceType" xml:space="preserve"><value>Website</value></data>
+  <data name="EncyclopediaSourceType" xml:space="preserve"><value>Encyclopedia</value></data>
+  <data name="OtherSourceType" xml:space="preserve"><value>Other</value></data>
+  <data name="SelectedActionsButton.Content" xml:space="preserve"><value>Selected actions</value></data>
+  <data name="SelectedActionsButton.AutomationProperties.Name" xml:space="preserve"><value>Actions for selected articles</value></data>
+  <data name="AddSelectedToTopicsMenuItem.Text" xml:space="preserve"><value>Add to topics</value></data>
+  <data name="RemoveSelectedFromTopicMenuItem.Text" xml:space="preserve"><value>Remove from current topic</value></data>
+  <data name="ChangeSelectedStatusMenuItem.Text" xml:space="preserve"><value>Change status</value></data>
+  <data name="ExportSelectedMenuItem.Text" xml:space="preserve"><value>Export</value></data>
+  <data name="MoveSelectedToTrashMenuItem.Text" xml:space="preserve"><value>Move to Trash</value></data>
+  <data name="ChangeArticleStatusTitle" xml:space="preserve"><value>Change article status</value></data>
+  <data name="ArticleStatusFieldHeader" xml:space="preserve"><value>Status</value></data>
+  <data name="ApplyButtonText" xml:space="preserve"><value>Apply</value></data>
+  <data name="SelectedArticlesAddedToTopicsFormat" xml:space="preserve"><value>{0:N0} selected articles added to topics.</value></data>
+  <data name="SelectedArticlesRemovedFromTopicFormat" xml:space="preserve"><value>{0:N0} selected articles removed from the current topic.</value></data>
+  <data name="SelectedArticlesStatusChangedFormat" xml:space="preserve"><value>Status changed for {0:N0} selected articles.</value></data>
+  <data name="SelectedArticlesMovedToTrashFormat" xml:space="preserve"><value>{0:N0} selected articles moved to Trash.</value></data>
+  <data name="MoveArticlesToTrashTitle" xml:space="preserve"><value>Move selected articles to Trash?</value></data>
+  <data name="MoveArticlesToTrashMessageFormat" xml:space="preserve"><value>The {0:N0} selected articles can be restored from Trash.</value></data>
+  <data name="ImportFileReadFailedText" xml:space="preserve"><value>This file could not be read. Technical details were written to the local log.</value></data>
+</root>

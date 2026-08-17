@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>x64</Platforms>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3.mtp-off" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Pedia.Core\Pedia.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\Pedia.App\Models\PresentationModels.cs" Link="AppProduction\PresentationModels.cs" />
+    <Compile Include="..\..\src\Pedia.App\Services\PediaSettings.cs" Link="AppProduction\PediaSettings.cs" />
+    <Compile Include="..\..\src\Pedia.App\ViewModels\ArticleBrowserViewModel.cs" Link="AppProduction\ArticleBrowserViewModel.cs" />
+    <Compile Include="..\..\src\Pedia.App\ViewModels\ArticleDetailViewModel.cs" Link="AppProduction\ArticleDetailViewModel.cs" />
+    <Compile Include="..\..\src\Pedia.App\ViewModels\ArticleRowViewModel.cs" Link="AppProduction\ArticleRowViewModel.cs" />
+    <Compile Include="..\..\src\Pedia.App\ViewModels\TopicNodeViewModel.cs" Link="AppProduction\TopicNodeViewModel.cs" />
+    <Compile Include="..\..\src\Pedia.App\ViewModels\TopicPaneViewModel.cs" Link="AppProduction\TopicPaneViewModel.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Pedia.Views.ArticleBrowserView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Pedia.Models"
+    xmlns:converters="using:Pedia.Converters"
+    xmlns:vm="using:Pedia.ViewModels"
+    d:DesignHeight="800"
+    d:DesignWidth="560"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
+        <converters:BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </UserControl.Resources>
+
+    <Grid Background="{ThemeResource PediaSecondarySurfaceBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Padding="12,12,12,7" ColumnSpacing="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Grid.ColumnSpan="2"
+                Margin="0,0,0,7"
+                Style="{StaticResource PediaPaneHeaderTextStyle}"
+                Text="{x:Bind ViewModel.ScopeTitle, Mode=OneWay}"
+                TextTrimming="CharacterEllipsis" />
+            <AutoSuggestBox
+                x:Name="SearchBox"
+                x:Uid="SearchBox"
+                Grid.Row="1"
+                QueryIcon="Find"
+                PlaceholderText="{x:Bind ViewModel.SearchPlaceholder, Mode=OneWay}"
+                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                AutomationProperties.HelpText="Ctrl+K">
+                <AutoSuggestBox.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="K" Modifiers="Control" Invoked="OnFocusSearchAccelerator" />
+                </AutoSuggestBox.KeyboardAccelerators>
+            </AutoSuggestBox>
+            <Button
+                x:Uid="SearchFiltersButton"
+                Grid.Row="1"
+                Grid.Column="1"
+                Style="{StaticResource PediaIconButtonStyle}">
+                <FontIcon Glyph="&#xE71C;" />
+                <Button.Flyout>
+                    <Flyout Placement="BottomEdgeAlignedRight">
+                        <ScrollViewer MaxHeight="650" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Width="340" Spacing="10">
+                            <ComboBox
+                                x:Uid="SearchScopeLabel"
+                                HorizontalAlignment="Stretch"
+                                ItemsSource="{x:Bind ViewModel.SearchScopes}"
+                                DisplayMemberPath="Label"
+                                SelectedItem="{x:Bind ViewModel.SelectedSearchScope, Mode=TwoWay}" />
+                            <TextBlock x:Uid="LanguagesFilterLabel" Style="{StaticResource PediaMutedTextStyle}" />
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <CheckBox x:Uid="IncludeEnglishCheckBox" IsChecked="{x:Bind ViewModel.IncludeEnglish, Mode=TwoWay}" />
+                                <CheckBox x:Uid="IncludeFinnishCheckBox" IsChecked="{x:Bind ViewModel.IncludeFinnish, Mode=TwoWay}" />
+                            </StackPanel>
+                            <CheckBox x:Uid="FavoritesOnlyCheckBox" IsEnabled="{x:Bind ViewModel.CanToggleFavoritesOnly, Mode=OneWay}" IsChecked="{x:Bind ViewModel.FavoritesOnly, Mode=TwoWay}" />
+                            <ComboBox x:Uid="SourceMetadataFilter" ItemsSource="{x:Bind ViewModel.SourceFilters}" SelectedItem="{x:Bind ViewModel.SelectedSourceFilter, Mode=TwoWay}" DisplayMemberPath="Label" HorizontalAlignment="Stretch" />
+                            <CheckBox
+                                x:Uid="IncludeSubtopicsCheckBox"
+                                IsEnabled="{x:Bind ViewModel.CanToggleIncludeSubtopics, Mode=OneWay}"
+                                IsChecked="{x:Bind ViewModel.IncludeSubtopics, Mode=TwoWay}" />
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <NumberBox x:Uid="MinimumWordsFilter" Minimum="0" SpinButtonPlacementMode="Compact" Value="{x:Bind ViewModel.MinimumWordCount, Mode=TwoWay}" />
+                                <NumberBox x:Uid="MaximumWordsFilter" Grid.Column="1" Minimum="0" SpinButtonPlacementMode="Compact" Value="{x:Bind ViewModel.MaximumWordCount, Mode=TwoWay}" />
+                            </Grid>
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <DatePicker x:Uid="CreatedFromFilter" SelectedDate="{x:Bind ViewModel.CreatedFrom, Mode=TwoWay}" HorizontalAlignment="Stretch" />
+                                <DatePicker x:Uid="CreatedToFilter" Grid.Column="1" SelectedDate="{x:Bind ViewModel.CreatedTo, Mode=TwoWay}" HorizontalAlignment="Stretch" />
+                            </Grid>
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <DatePicker x:Uid="UpdatedFromFilter" SelectedDate="{x:Bind ViewModel.UpdatedFrom, Mode=TwoWay}" HorizontalAlignment="Stretch" />
+                                <DatePicker x:Uid="UpdatedToFilter" Grid.Column="1" SelectedDate="{x:Bind ViewModel.UpdatedTo, Mode=TwoWay}" HorizontalAlignment="Stretch" />
+                            </Grid>
+                            <ComboBox x:Uid="ArchivedStateFilter" ItemsSource="{x:Bind ViewModel.ArchivedFilters}" SelectedItem="{x:Bind ViewModel.SelectedArchivedFilter, Mode=TwoWay}" DisplayMemberPath="Label" HorizontalAlignment="Stretch" />
+                            <ComboBox x:Uid="SampleContentFilter" ItemsSource="{x:Bind ViewModel.SampleFilters}" SelectedItem="{x:Bind ViewModel.SelectedSampleFilter, Mode=TwoWay}" DisplayMemberPath="Label" HorizontalAlignment="Stretch" />
+                            <Button
+                                x:Uid="ClearFiltersButton"
+                                HorizontalAlignment="Right"
+                                Command="{x:Bind ViewModel.ClearFiltersCommand}" />
+                        </StackPanel>
+                        </ScrollViewer>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+        </Grid>
+
+        <Grid Grid.Row="1" Padding="12,0,12,10" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.ColumnSpan="4" Margin="0,0,0,2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Text="{x:Bind ViewModel.ActiveFilterSummary, Mode=OneWay}" Style="{StaticResource PediaMutedTextStyle}" IsHitTestVisible="False" />
+            <ComboBox
+                x:Uid="LanguageFilter"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{x:Bind ViewModel.Languages}"
+                SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}" />
+            <ComboBox
+                x:Uid="TypeFilter"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{x:Bind ViewModel.ArticleTypes}"
+                DisplayMemberPath="Label"
+                SelectedItem="{x:Bind ViewModel.SelectedArticleType, Mode=TwoWay}" />
+            <ComboBox
+                x:Uid="StatusFilter"
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{x:Bind ViewModel.ArticleStatuses}"
+                DisplayMemberPath="Label"
+                SelectedItem="{x:Bind ViewModel.SelectedArticleStatus, Mode=TwoWay}" />
+            <Button
+                x:Uid="ClearFiltersButton"
+                Grid.Column="3"
+                Command="{x:Bind ViewModel.ClearFiltersCommand}"
+                Style="{StaticResource PediaToolbarButtonStyle}" />
+        </Grid>
+
+        <Grid
+            Grid.Row="2"
+            MinHeight="38"
+            Padding="8,0"
+            Background="{ThemeResource PediaElevatedSurfaceBrush}"
+            BorderBrush="{ThemeResource PediaPrimaryBorderBrush}"
+            BorderThickness="0,1,0,1"
+            ColumnSpacing="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" MinWidth="150" />
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="74" />
+                <ColumnDefinition Width="92" />
+                <ColumnDefinition Width="126" />
+            </Grid.ColumnDefinitions>
+            <Button
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind ViewModel.SortCommand}"
+                CommandParameter="{x:Bind models:ArticleSortField.Title}">
+                <StackPanel Orientation="Horizontal" Spacing="5"><TextBlock x:Uid="ArticleColumnButton" /><FontIcon Glyph="{x:Bind ViewModel.TitleSortGlyph, Mode=OneWay}" FontSize="10" /></StackPanel>
+            </Button>
+            <Button
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind ViewModel.SortCommand}"
+                CommandParameter="{x:Bind models:ArticleSortField.Language}">
+                <StackPanel Orientation="Horizontal" Spacing="5"><TextBlock x:Uid="LanguageColumnButton" /><FontIcon Glyph="{x:Bind ViewModel.LanguageSortGlyph, Mode=OneWay}" FontSize="10" /></StackPanel>
+            </Button>
+            <Button
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Right"
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind ViewModel.SortCommand}"
+                CommandParameter="{x:Bind models:ArticleSortField.WordCount}">
+                <StackPanel Orientation="Horizontal" Spacing="5"><TextBlock x:Uid="WordsColumnButton" /><FontIcon Glyph="{x:Bind ViewModel.WordCountSortGlyph, Mode=OneWay}" FontSize="10" /></StackPanel>
+            </Button>
+            <Button
+                Grid.Column="3"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind ViewModel.SortCommand}"
+                CommandParameter="{x:Bind models:ArticleSortField.Status}">
+                <StackPanel Orientation="Horizontal" Spacing="5"><TextBlock x:Uid="StatusColumnButton" /><FontIcon Glyph="{x:Bind ViewModel.StatusSortGlyph, Mode=OneWay}" FontSize="10" /></StackPanel>
+            </Button>
+            <Button
+                Grid.Column="4"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind ViewModel.SortCommand}"
+                CommandParameter="{x:Bind models:ArticleSortField.Updated}">
+                <StackPanel Orientation="Horizontal" Spacing="5"><TextBlock x:Uid="UpdatedColumnButton" /><FontIcon Glyph="{x:Bind ViewModel.UpdatedSortGlyph, Mode=OneWay}" FontSize="10" /></StackPanel>
+            </Button>
+        </Grid>
+
+        <Grid Grid.Row="3">
+            <ListView
+                x:Name="ArticleList"
+                x:Uid="ArticleList"
+                ItemsSource="{x:Bind ViewModel.Articles}"
+                SelectedItem="{x:Bind ViewModel.SelectedArticle, Mode=TwoWay}"
+                IsItemClickEnabled="True"
+                DoubleTapped="OnArticleDoubleTapped"
+                SelectionChanged="OnArticleSelectionChanged"
+                SelectionMode="Extended">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsStackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ArticleRowViewModel">
+                        <Grid
+                            MinHeight="40"
+                            Padding="10,2"
+                            ColumnSpacing="4"
+                            AutomationProperties.Name="{x:Bind AccessibleName}">
+                            <Grid.ContextFlyout>
+                                <MenuFlyout Opening="OnArticleContextMenuOpening">
+                                    <MenuFlyoutItem x:Uid="OpenArticleMenuItem" Tag="open" Click="OnArticleContextAction" />
+                                    <MenuFlyoutItem x:Uid="EditArticleMenuItem" Tag="edit" Click="OnArticleContextAction" />
+                                    <MenuFlyoutItem x:Uid="DuplicateArticleMenuItem" Tag="duplicate" Click="OnArticleContextAction" />
+                                    <MenuFlyoutItem x:Uid="AddArticleToTopicsMenuItem" Tag="add-topics" Click="OnArticleContextAction" />
+                                    <MenuFlyoutItem x:Uid="RemoveArticleFromTopicMenuItem" Tag="remove-topic" Click="OnArticleContextAction" />
+                                    <MenuFlyoutItem x:Uid="FavoriteArticleMenuItem" Tag="favorite" Click="OnArticleContextAction" />
+                                    <MenuFlyoutItem x:Uid="ExportArticleMenuItem" Tag="export" Click="OnArticleContextAction" />
+                                    <MenuFlyoutSeparator />
+                                    <MenuFlyoutItem x:Uid="TrashArticleMenuItem" Tag="trash" Click="OnArticleContextAction" />
+                                    <MenuFlyoutItem x:Uid="RestoreArticleMenuItem" Tag="restore" Click="OnArticleContextAction" />
+                                    <MenuFlyoutItem x:Uid="DeleteForeverArticleMenuItem" Tag="delete" Click="OnArticleContextAction" />
+                                </MenuFlyout>
+                            </Grid.ContextFlyout>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*" MinWidth="150" />
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="74" />
+                                <ColumnDefinition Width="92" />
+                                <ColumnDefinition Width="126" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock
+                                    Text="{x:Bind Title}"
+                                    TextTrimming="CharacterEllipsis"
+                                    ToolTipService.ToolTip="{x:Bind Title}" />
+                                <TextBlock
+                                    MaxHeight="19"
+                                    Style="{StaticResource PediaMutedTextStyle}"
+                                    Text="{x:Bind MatchSnippet}"
+                                    TextTrimming="CharacterEllipsis"
+                                    Visibility="{x:Bind HasMatchSnippet, Converter={StaticResource BoolToVisibility}}" />
+                            </StackPanel>
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource PediaMetadataTextStyle}"
+                                Text="{x:Bind LanguageDisplay}"
+                                TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                Grid.Column="2"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Right"
+                                Style="{StaticResource PediaMetadataTextStyle}"
+                                Text="{x:Bind WordCountDisplay}" />
+                            <TextBlock
+                                Grid.Column="3"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource PediaMetadataTextStyle}"
+                                Text="{x:Bind StatusDisplay}"
+                                TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                Grid.Column="4"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource PediaMetadataTextStyle}"
+                                Text="{x:Bind UpdatedDisplay}"
+                                TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Enter" Invoked="OnOpenArticleAccelerator" />
+                    <KeyboardAccelerator Key="Delete" Invoked="OnTrashArticleAccelerator" />
+                </ListView.KeyboardAccelerators>
+            </ListView>
+
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="8"
+                Visibility="{x:Bind ViewModel.HasResults, Mode=OneWay, Converter={StaticResource InverseBoolToVisibility}}">
+                <FontIcon Glyph="&#xE8A5;" FontSize="26" Foreground="{ThemeResource PediaMutedTextBrush}" />
+                <TextBlock x:Uid="NoArticlesText" Style="{StaticResource PediaMutedTextStyle}" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="4" MinHeight="48" Padding="12,6" ColumnSpacing="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="10">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Style="{StaticResource PediaMetadataTextStyle}"
+                    Text="{x:Bind ViewModel.PageRangeText, Mode=OneWay}" />
+                <Button x:Uid="EmptyTrashButton" Command="{x:Bind ViewModel.EmptyTrashCommand}" Visibility="{x:Bind ViewModel.IsTrashScope, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
+                <Button
+                    x:Uid="SelectedActionsButton"
+                    IsEnabled="{x:Bind ViewModel.HasActiveSelection, Mode=OneWay}">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem x:Uid="AddSelectedToTopicsMenuItem" Command="{x:Bind ViewModel.AddSelectedToTopicsCommand}" />
+                            <MenuFlyoutItem x:Uid="RemoveSelectedFromTopicMenuItem" Command="{x:Bind ViewModel.RemoveSelectedFromTopicCommand}" />
+                            <MenuFlyoutItem x:Uid="ChangeSelectedStatusMenuItem" Command="{x:Bind ViewModel.ChangeSelectedStatusCommand}" />
+                            <MenuFlyoutItem x:Uid="ExportSelectedMenuItem" Command="{x:Bind ViewModel.ExportSelectedCommand}" />
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem x:Uid="MoveSelectedToTrashMenuItem" Command="{x:Bind ViewModel.MoveSelectedToTrashCommand}" />
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
+            </StackPanel>
+            <Button
+                x:Uid="FirstPageButton"
+                Grid.Column="1"
+                Command="{x:Bind ViewModel.FirstPageCommand}"
+                Style="{StaticResource PediaIconButtonStyle}">
+                <FontIcon Glyph="&#xE892;" FontSize="12" />
+            </Button>
+            <Button
+                x:Uid="PreviousPageButton"
+                Grid.Column="2"
+                Command="{x:Bind ViewModel.PreviousPageCommand}"
+                Style="{StaticResource PediaIconButtonStyle}">
+                <FontIcon Glyph="&#xE76B;" FontSize="12" />
+            </Button>
+            <Border
+                Grid.Column="3"
+                MinWidth="54"
+                Padding="8,5"
+                Background="{ThemeResource PediaElevatedSurfaceBrush}"
+                CornerRadius="4">
+                <TextBlock HorizontalAlignment="Center" Text="{x:Bind ViewModel.PageNumberText, Mode=OneWay}" />
+            </Border>
+            <Button
+                x:Uid="NextPageButton"
+                Grid.Column="4"
+                Command="{x:Bind ViewModel.NextPageCommand}"
+                Style="{StaticResource PediaIconButtonStyle}">
+                <FontIcon Glyph="&#xE76C;" FontSize="12" />
+            </Button>
+            <Button
+                x:Uid="LastPageButton"
+                Grid.Column="5"
+                Command="{x:Bind ViewModel.LastPageCommand}"
+                Style="{StaticResource PediaIconButtonStyle}">
+                <FontIcon Glyph="&#xE893;" FontSize="12" />
+            </Button>
+            <TextBlock x:Uid="PerPageText" Grid.Column="6" VerticalAlignment="Center" Style="{StaticResource PediaMutedTextStyle}" />
+            <ComboBox
+                x:Uid="PageSizeBox"
+                Grid.Column="7"
+                MinWidth="70"
+                ItemsSource="{x:Bind ViewModel.PageSizes}"
+                SelectedItem="{x:Bind ViewModel.PageSize, Mode=TwoWay}" />
+        </Grid>
+    </Grid>
+</UserControl>

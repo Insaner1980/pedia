@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Pedia.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Pedia.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+bin/
+obj/
+.vs/
+.sonar/
+.sonarqube/
+AppPackages/
+BundleArtifacts/
+Generated Files/
+TestResults/
+reports/
+*.user
+*.suo
+*.pfx
+*.cer
+*.db
+*.db-shm
+*.db-wal
+*.pediabackup
+*.log

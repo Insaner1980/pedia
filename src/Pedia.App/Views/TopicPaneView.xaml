@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Pedia.Views.TopicPaneView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Pedia.ViewModels"
+    d:DesignHeight="800"
+    d:DesignWidth="290"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource PediaPrimaryPaneBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Padding="16,13,10,9" ColumnSpacing="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                x:Uid="TopicsHeader"
+                VerticalAlignment="Center"
+                Style="{StaticResource PediaPaneHeaderTextStyle}" />
+            <Button
+                x:Name="AddTopicButton"
+                x:Uid="AddTopicButton"
+                Grid.Column="1"
+                Command="{x:Bind ViewModel.CreateRootTopicCommand}"
+                Style="{StaticResource PediaIconButtonStyle}">
+                <FontIcon Glyph="&#xE710;" />
+            </Button>
+            <Button
+                x:Name="TopicMenuButton"
+                x:Uid="TopicMenuButton"
+                Grid.Column="2"
+                Style="{StaticResource PediaIconButtonStyle}">
+                <FontIcon Glyph="&#xE712;" />
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem
+                            x:Uid="NewRootTopicMenuItem"
+                            Command="{x:Bind ViewModel.CreateRootTopicCommand}"
+                            Icon="Add" />
+                        <MenuFlyoutItem
+                            x:Uid="NewChildTopicMenuItem"
+                            Command="{x:Bind ViewModel.CreateChildTopicCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8B7;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem
+                            x:Uid="RenameTopicMenuItem"
+                            Command="{x:Bind ViewModel.RenameTopicCommand}">
+                            <MenuFlyoutItem.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="F2" />
+                            </MenuFlyoutItem.KeyboardAccelerators>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem
+                            x:Uid="MoveTopicMenuItem"
+                            Command="{x:Bind ViewModel.MoveTopicCommand}" />
+                        <MenuFlyoutItem x:Uid="MoveTopicUpMenuItem" Command="{x:Bind ViewModel.MoveTopicUpCommand}" />
+                        <MenuFlyoutItem x:Uid="MoveTopicDownMenuItem" Command="{x:Bind ViewModel.MoveTopicDownCommand}" />
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem x:Uid="ExpandTopicsMenuItem" Command="{x:Bind ViewModel.ExpandDescendantsCommand}" />
+                        <MenuFlyoutItem x:Uid="CollapseTopicsMenuItem" Command="{x:Bind ViewModel.CollapseDescendantsCommand}" />
+                        <MenuFlyoutItem x:Uid="CopyTopicPathMenuItem" Command="{x:Bind ViewModel.CopyTopicPathCommand}" />
+                        <MenuFlyoutItem
+                            x:Uid="DeleteTopicMenuItem"
+                            Command="{x:Bind ViewModel.DeleteTopicCommand}"
+                            Icon="Delete" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+        </Grid>
+
+        <TextBox
+            x:Name="TopicFilterBox"
+            x:Uid="TopicFilterBox"
+            Grid.Row="1"
+            Margin="12,0,12,8"
+            Text="{x:Bind ViewModel.TopicFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <TextBox.Resources>
+                <x:Double x:Key="TextControlThemeMinHeight">32</x:Double>
+            </TextBox.Resources>
+        </TextBox>
+
+        <TreeView
+            x:Name="TopicTree"
+            x:Uid="TopicTree"
+            Grid.Row="2"
+            Padding="4,0,6,8"
+            ItemsSource="{x:Bind ViewModel.RootNodes}"
+            SelectedItem="{x:Bind ViewModel.SelectedNode, Mode=OneWay}"
+            SelectionMode="Single"
+            SelectionChanged="OnTopicSelectionChanged">
+            <TreeView.ItemTemplate>
+                <DataTemplate x:DataType="vm:TopicNodeViewModel">
+                    <TreeViewItem
+                        AutomationProperties.Name="{x:Bind AccessibleName}"
+                        IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}"
+                        ItemsSource="{x:Bind Children}">
+                        <TreeViewItem.ContextFlyout>
+                            <MenuFlyout Opening="OnTopicContextMenuOpening">
+                                <MenuFlyoutItem
+                                    x:Uid="NewChildTopicMenuItem"
+                                    Tag="new-child"
+                                    Click="OnTopicContextAction" />
+                                <MenuFlyoutItem
+                                    x:Uid="RenameTopicMenuItem"
+                                    Tag="rename"
+                                    Click="OnTopicContextAction" />
+                                <MenuFlyoutItem
+                                    x:Uid="MoveTopicMenuItem"
+                                    Tag="move"
+                                    Click="OnTopicContextAction" />
+                                <MenuFlyoutItem x:Uid="MoveTopicUpMenuItem" Tag="move-up" Click="OnTopicContextAction" />
+                                <MenuFlyoutItem x:Uid="MoveTopicDownMenuItem" Tag="move-down" Click="OnTopicContextAction" />
+                                <MenuFlyoutItem x:Uid="ExpandTopicsMenuItem" Tag="expand" Click="OnTopicContextAction" />
+                                <MenuFlyoutItem x:Uid="CollapseTopicsMenuItem" Tag="collapse" Click="OnTopicContextAction" />
+                                <MenuFlyoutItem x:Uid="CopyTopicPathMenuItem" Tag="copy-path" Click="OnTopicContextAction" />
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem
+                                    x:Uid="DeleteTopicMenuItem"
+                                    Tag="delete"
+                                    Click="OnTopicContextAction" />
+                            </MenuFlyout>
+                        </TreeViewItem.ContextFlyout>
+                        <Grid
+                            MinWidth="150"
+                            Padding="2,0"
+                            ColumnSpacing="8"
+                            ToolTipService.ToolTip="{x:Bind FullPath}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{ThemeResource PediaSecondaryTextBrush}"
+                                Glyph="{x:Bind Glyph}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind Name}"
+                                TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                Grid.Column="2"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource PediaMutedTextStyle}"
+                                Text="{x:Bind CountText}" />
+                        </Grid>
+                    </TreeViewItem>
+                </DataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+
+        <Button
+            x:Uid="CollapseTopicPaneButton"
+            Grid.Row="3"
+            Margin="8,4,8,8"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Left"
+            Click="OnCollapsePaneClick">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon Glyph="&#xE76B;" FontSize="12" />
+                <TextBlock x:Uid="CollapseTopicPaneButtonLabel" />
+            </StackPanel>
+        </Button>
+    </Grid>
+</UserControl>

@@ -46,6 +46,14 @@ $reportPath = Join-Path $reportsDir 'sonar.txt'
 $testResultsDir = Join-Path $reportsDir 'sonar-test-results'
 
 New-Item -ItemType Directory -Force -Path $reportsDir | Out-Null
+$reportsRoot = [IO.Path]::GetFullPath($reportsDir) + [IO.Path]::DirectorySeparatorChar
+$testResultsRoot = [IO.Path]::GetFullPath($testResultsDir) + [IO.Path]::DirectorySeparatorChar
+if (-not $testResultsRoot.StartsWith($reportsRoot, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Testitulosten polku ei ole reports-kansion sisällä: $testResultsRoot"
+}
+if (Test-Path -LiteralPath $testResultsDir) {
+    Remove-Item -LiteralPath $testResultsDir -Recurse -Force
+}
 New-Item -ItemType Directory -Force -Path $testResultsDir | Out-Null
 Set-Content -LiteralPath $reportPath -Encoding utf8 -Value @(
     'sonar'
@@ -70,6 +78,7 @@ try {
         "/d:sonar.token=$env:SONAR_TOKEN"
         '/d:sonar.cs.opencover.reportsPaths=reports/sonar-test-results/**/coverage.opencover.xml'
         '/d:sonar.cs.vstest.reportsPaths=reports/sonar-test-results/*.trx'
+        '/d:sonar.coverage.exclusions=src/Pedia.App/**'
         '/d:sonar.qualitygate.wait=true'
     )
     Invoke-DotNetCommand -ReportPath $reportPath -Arguments @(

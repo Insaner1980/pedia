@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Pedia.Core.Backup;
@@ -19,7 +20,6 @@ namespace Pedia.Services;
 
 public sealed class CorePediaDataService : IPediaDataService
 {
-    private readonly DatabaseOptions _databaseOptions;
     private readonly SqliteConnectionFactory _connections;
     private readonly DatabaseInitializer _initializer;
     private readonly TopicRepository _topics;
@@ -35,8 +35,11 @@ public sealed class CorePediaDataService : IPediaDataService
 
     public bool IsNewDatabase => _initialization?.IsNewDatabase == true;
 
+    [SuppressMessage(
+        "Maintainability",
+        "S107",
+        Justification = "The dependency-injection constructor explicitly declares the service's required collaborators.")]
     public CorePediaDataService(
-        DatabaseOptions databaseOptions,
         SqliteConnectionFactory connections,
         DatabaseInitializer initializer,
         TopicRepository topics,
@@ -49,7 +52,6 @@ public sealed class CorePediaDataService : IPediaDataService
         IStringService strings,
         ILogger<CorePediaDataService> logger)
     {
-        _databaseOptions = databaseOptions;
         _connections = connections;
         _initializer = initializer;
         _topics = topics;
@@ -394,6 +396,10 @@ public sealed class CorePediaDataService : IPediaDataService
                 .ToArray());
     }
 
+    [SuppressMessage(
+        "Maintainability",
+        "S6672",
+        Justification = "This adapter intentionally forwards import events through the enclosing service logger.")]
     private sealed class ImportLoggerAdapter(ILogger<CorePediaDataService> logger) : ILogger<FileImportService>
     {
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull => logger.BeginScope(state);
@@ -446,9 +452,9 @@ public sealed class CorePediaDataService : IPediaDataService
         {
             var content = coreFormat switch
             {
-                DocumentExportFormat.Markdown => _exports.SerializeMarkdown(articles[0]),
+                DocumentExportFormat.Markdown => DocumentExportService.SerializeMarkdown(articles[0]),
                 DocumentExportFormat.PediaJson => _exports.SerializePediaJson(articles[0]),
-                _ => _exports.SerializePlainText(articles[0])
+                _ => DocumentExportService.SerializePlainText(articles[0])
             };
             await File.WriteAllTextAsync(destinationPath, content, new UTF8Encoding(false), cancellationToken);
             return;
@@ -557,34 +563,6 @@ public sealed class CorePediaDataService : IPediaDataService
             Notes = NullIfWhiteSpace(source.Notes)
         }).ToArray(),
         TopicAssignments = article.Topics.Select(topic => new CoreArticleTopicDraft(topic.TopicId, topic.IsPrimary)).ToArray()
-    };
-
-    private static CoreArticleDraft ToCoreDraft(Pedia.Core.Models.ArticleDetails article) => new()
-    {
-        Title = article.Title,
-        Subtitle = article.Subtitle,
-        Summary = article.Summary,
-        LanguageCode = article.LanguageCode,
-        ArticleType = article.ArticleType,
-        Status = article.Status,
-        Notes = article.Notes,
-        IsFavorite = article.IsFavorite,
-        IsSample = article.IsSample,
-        Sections = article.Sections.Select(section => new CoreArticleSectionDraft(section.Heading, section.HeadingLevel, section.Body)).ToArray(),
-        Sources = article.Sources.Select(source => new CoreArticleSourceDraft
-        {
-            SourceType = source.SourceType,
-            Title = source.Title,
-            Url = source.Url,
-            ExternalPageId = source.ExternalPageId,
-            ExternalRevisionId = source.ExternalRevisionId,
-            LicenseName = source.LicenseName,
-            AttributionText = source.AttributionText,
-            RetrievedAtUtc = source.RetrievedAtUtc,
-            LastCheckedAtUtc = source.LastCheckedAtUtc,
-            Notes = source.Notes
-        }).ToArray(),
-        TopicAssignments = article.TopicAssignments.Select(topic => new CoreArticleTopicDraft(topic.TopicId, topic.IsPrimary)).ToArray()
     };
 
     private static string? CleanSnippet(string? snippet) => snippet?

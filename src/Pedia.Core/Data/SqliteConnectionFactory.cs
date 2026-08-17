@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.Sqlite;
 
 namespace Pedia.Core.Data;
@@ -27,6 +28,10 @@ public sealed class SqliteConnectionFactory
 
     public DatabaseWriteGate WriteGate { get; }
 
+    [SuppressMessage(
+        "Security",
+        "S2077",
+        Justification = "The interpolated PRAGMA value is a validated integer from DatabaseOptions, not user-provided SQL.")]
     public async Task<SqliteConnection> OpenConnectionAsync(CancellationToken cancellationToken = default)
     {
         var directory = Path.GetDirectoryName(_options.DatabasePath);

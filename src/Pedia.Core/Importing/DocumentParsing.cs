@@ -25,24 +25,7 @@ public static partial class MarkdownDocumentParser
             var heading = HeadingPattern().Match(line);
             if (heading.Success)
             {
-                FlushParagraph(paragraph, currentBlocks);
-                var level = heading.Groups[1].Value.Length;
-                var headingText = CleanInlineMarkdown(heading.Groups[2].Value);
-                if (level == 1 && !firstH1Seen)
-                {
-                    firstH1Seen = true;
-                    if (!string.IsNullOrWhiteSpace(headingText))
-                    {
-                        title = headingText;
-                    }
-                }
-                else if (level is 2 or 3 && !string.IsNullOrWhiteSpace(headingText))
-                {
-                    var section = new MutableSection(headingText, level);
-                    sections.Add(section);
-                    currentBlocks = section.Blocks;
-                }
-
+                ApplyHeading(heading, paragraph, sections, ref currentBlocks, ref title, ref firstH1Seen);
                 index++;
                 continue;
             }
@@ -137,6 +120,36 @@ public static partial class MarkdownDocumentParser
         return WebUtility.HtmlDecode(withoutTags).Trim();
     }
 
+    private static void ApplyHeading(
+        Match heading,
+        List<string> paragraph,
+        List<MutableSection> sections,
+        ref List<ContentBlock> currentBlocks,
+        ref string title,
+        ref bool firstH1Seen)
+    {
+        FlushParagraph(paragraph, currentBlocks);
+        var level = heading.Groups[1].Value.Length;
+        var headingText = CleanInlineMarkdown(heading.Groups[2].Value);
+        if (level == 1 && !firstH1Seen)
+        {
+            firstH1Seen = true;
+            if (!string.IsNullOrWhiteSpace(headingText))
+            {
+                title = headingText;
+            }
+
+            return;
+        }
+
+        if (level is 2 or 3 && !string.IsNullOrWhiteSpace(headingText))
+        {
+            var section = new MutableSection(headingText, level);
+            sections.Add(section);
+            currentBlocks = section.Blocks;
+        }
+    }
+
     private static string SanitizeMarkdown(string value)
     {
         var withoutDangerousElements = DangerousHtmlElementPattern().Replace(value, string.Empty);
@@ -166,7 +179,7 @@ public static partial class MarkdownDocumentParser
     [GeneratedRegex(@"<[^>]+>", RegexOptions.CultureInvariant)]
     private static partial Regex HtmlTagPattern();
 
-    [GeneratedRegex(@"<\s*(script|style|iframe|object|embed|svg|math)\b[^>]*>.*?<\s*/\s*\1\s*>", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"<\s*(?:script|style|iframe|object|embed|svg|math)\b[^>]*>.*?<\s*/\s*(?:script|style|iframe|object|embed|svg|math)\s*>", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.CultureInvariant)]
     private static partial Regex DangerousHtmlElementPattern();
 
     [GeneratedRegex(@"<!--.*?-->", RegexOptions.Singleline | RegexOptions.CultureInvariant)]
@@ -217,7 +230,7 @@ public static class TextDocumentParser
         return new ParsedDocument(title, blocks, Array.Empty<DocumentSection>());
     }
 
-    private static bool LooksLikeTitle(IReadOnlyList<string> lines, int index)
+    private static bool LooksLikeTitle(string[] lines, int index)
     {
         var candidate = lines[index].Trim();
         if (candidate.Length is 0 or > 120
@@ -230,6 +243,6 @@ public static class TextDocumentParser
             return false;
         }
 
-        return index == lines.Count - 1 || string.IsNullOrWhiteSpace(lines[index + 1]);
+        return index == lines.Length - 1 || string.IsNullOrWhiteSpace(lines[index + 1]);
     }
 }

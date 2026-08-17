@@ -4,7 +4,7 @@ using Microsoft.Windows.ApplicationModel.Resources;
 
 namespace Pedia.Converters;
 
-public sealed class BooleanToVisibilityConverter : IValueConverter
+public sealed partial class BooleanToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) =>
         value is true ? Visibility.Visible : Visibility.Collapsed;
@@ -13,7 +13,7 @@ public sealed class BooleanToVisibilityConverter : IValueConverter
         value is Visibility.Visible;
 }
 
-public sealed class InverseBooleanToVisibilityConverter : IValueConverter
+public sealed partial class InverseBooleanToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) =>
         value is true ? Visibility.Collapsed : Visibility.Visible;
@@ -22,7 +22,7 @@ public sealed class InverseBooleanToVisibilityConverter : IValueConverter
         value is not Visibility.Visible;
 }
 
-public sealed class NullToVisibilityConverter : IValueConverter
+public sealed partial class NullToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) =>
         value is null ? Visibility.Collapsed : Visibility.Visible;
@@ -30,7 +30,7 @@ public sealed class NullToVisibilityConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
 }
 
-public sealed class StringToVisibilityConverter : IValueConverter
+public sealed partial class StringToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) =>
         string.IsNullOrWhiteSpace(value as string) ? Visibility.Collapsed : Visibility.Visible;
@@ -38,7 +38,7 @@ public sealed class StringToVisibilityConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
 }
 
-public sealed class HeadingLevelToFontSizeConverter : IValueConverter
+public sealed partial class HeadingLevelToFontSizeConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) => value switch
     {
@@ -50,7 +50,7 @@ public sealed class HeadingLevelToFontSizeConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
 }
 
-public sealed class DateTimeOffsetToStringConverter : IValueConverter
+public sealed partial class DateTimeOffsetToStringConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) => value switch
     {
@@ -61,7 +61,7 @@ public sealed class DateTimeOffsetToStringConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
 }
 
-public sealed class StoredValueToDisplayConverter : IValueConverter
+public sealed partial class StoredValueToDisplayConverter : IValueConverter
 {
     private readonly ResourceLoader _resources = new();
 

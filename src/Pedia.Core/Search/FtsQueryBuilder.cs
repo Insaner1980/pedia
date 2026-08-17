@@ -13,9 +13,9 @@ public static partial class FtsQueryBuilder
         }
 
         var clauses = new List<string>();
-        foreach (Match match in QueryPartPattern().Matches(input))
+        foreach (var groups in QueryPartPattern().Matches(input).Select(match => match.Groups))
         {
-            var phrase = match.Groups["phrase"];
+            var phrase = groups["phrase"];
             if (phrase.Success)
             {
                 var phraseTerms = TermPattern().Matches(phrase.Value).Select(item => item.Value).ToArray();
@@ -27,7 +27,7 @@ public static partial class FtsQueryBuilder
                 continue;
             }
 
-            var term = match.Groups["term"].Value;
+            var term = groups["term"].Value;
             if (term.Length > 0)
             {
                 clauses.Add(Quote(term) + "*");

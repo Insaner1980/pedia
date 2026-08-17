@@ -1,5 +1,6 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -371,6 +372,10 @@ public sealed partial class ArticleDetailViewModel : ObservableObject
         }
     }
 
+    [SuppressMessage(
+        "Reliability",
+        "S2692",
+        Justification = "Index zero is intentionally excluded because the first section cannot move upward.")]
     public bool CanMoveSectionUp(EditableSection? section) =>
         Editor is not null && section is not null && Editor.Sections.IndexOf(section) > 0;
 
@@ -446,6 +451,10 @@ public sealed partial class ArticleDetailViewModel : ObservableObject
         }
     }
 
+    [SuppressMessage(
+        "Reliability",
+        "S2692",
+        Justification = "Index zero is intentionally excluded because the first source cannot move upward.")]
     public bool CanMoveSourceUp(EditableSource? source) =>
         Editor is not null && source is not null && Editor.Sources.IndexOf(source) > 0;
 
@@ -789,7 +798,7 @@ public sealed partial class ArticleDetailViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task OpenSourceAsync(ArticleSourceData? source)
+    private static async Task OpenSourceAsync(ArticleSourceData? source)
     {
         if (source?.Url is not { Length: > 0 } url
             || !Uri.TryCreate(url, UriKind.Absolute, out var uri))
@@ -801,7 +810,7 @@ public sealed partial class ArticleDetailViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void CopySourceUrl(ArticleSourceData? source)
+    private static void CopySourceUrl(ArticleSourceData? source)
     {
         if (source?.Url is not { Length: > 0 } url)
         {

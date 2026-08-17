@@ -14,10 +14,7 @@ public static partial class FileNameUtilities
 
     public static string SanitizeFileName(string? value, int maximumLength = 120)
     {
-        if (maximumLength < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maximumLength));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(maximumLength, 1);
 
         var builder = new StringBuilder();
         foreach (var rune in (value ?? string.Empty).EnumerateRunes())
@@ -50,10 +47,7 @@ public static partial class FileNameUtilities
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(directoryPath);
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
-        if (number < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(number));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(number, 1);
 
         if (number == 1)
         {

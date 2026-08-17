@@ -30,7 +30,7 @@ public sealed class DocumentExportService
         _clock = clock ?? SystemClock.Instance;
     }
 
-    public string SerializePlainText(ParsedDocument document)
+    public static string SerializePlainText(ParsedDocument document)
     {
         ArgumentNullException.ThrowIfNull(document);
         var builder = new StringBuilder();
@@ -46,23 +46,7 @@ public sealed class DocumentExportService
         return builder.ToString().TrimEnd() + Environment.NewLine;
     }
 
-    public string SerializeMarkdown(ParsedDocument document)
-    {
-        ArgumentNullException.ThrowIfNull(document);
-        var builder = new StringBuilder();
-        builder.Append("# ").AppendLine(document.Title);
-        AppendBlocks(builder, document.LeadBlocks, markdown: true);
-        foreach (var section in document.Sections)
-        {
-            AppendBlankLine(builder);
-            builder.Append(new string('#', Math.Clamp(section.Level, 2, 3))).Append(' ').AppendLine(section.Heading);
-            AppendBlocks(builder, section.Blocks, markdown: true);
-        }
-
-        return builder.ToString().TrimEnd() + Environment.NewLine;
-    }
-
-    public string SerializePlainText(ArticleDetails article)
+    public static string SerializePlainText(ArticleDetails article)
     {
         ArgumentNullException.ThrowIfNull(article);
         var builder = new StringBuilder();
@@ -83,7 +67,23 @@ public sealed class DocumentExportService
         return builder.ToString().TrimEnd() + Environment.NewLine;
     }
 
-    public string SerializeMarkdown(ArticleDetails article)
+    public static string SerializeMarkdown(ParsedDocument document)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+        var builder = new StringBuilder();
+        builder.Append("# ").AppendLine(document.Title);
+        AppendBlocks(builder, document.LeadBlocks, markdown: true);
+        foreach (var section in document.Sections)
+        {
+            AppendBlankLine(builder);
+            builder.Append(new string('#', Math.Clamp(section.Level, 2, 3))).Append(' ').AppendLine(section.Heading);
+            AppendBlocks(builder, section.Blocks, markdown: true);
+        }
+
+        return builder.ToString().TrimEnd() + Environment.NewLine;
+    }
+
+    public static string SerializeMarkdown(ArticleDetails article)
     {
         ArgumentNullException.ThrowIfNull(article);
         var builder = new StringBuilder();
@@ -120,7 +120,7 @@ public sealed class DocumentExportService
         return JsonSerializer.Serialize(envelope, JsonOptions);
     }
 
-    public ParsedDocument DeserializePediaJson(string json)
+    public static ParsedDocument DeserializePediaJson(string json)
     {
         ArgumentNullException.ThrowIfNull(json);
         try
@@ -145,7 +145,7 @@ public sealed class DocumentExportService
         }
     }
 
-    public ArticleDetails DeserializePediaArticleJson(string json)
+    public static ArticleDetails DeserializePediaArticleJson(string json)
     {
         ArgumentNullException.ThrowIfNull(json);
         try
@@ -200,7 +200,8 @@ public sealed class DocumentExportService
         var baseName = FileNameUtilities.SanitizeFileName(document.Title);
         var fileName = baseName + extension;
 
-        for (var collisionNumber = 1; ; collisionNumber++)
+        var collisionNumber = 1;
+        while (true)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var candidate = FileNameUtilities.GetCollisionPath(directoryPath, fileName, collisionNumber);
@@ -221,6 +222,7 @@ public sealed class DocumentExportService
             catch (IOException) when (File.Exists(candidate))
             {
                 // Try the next explicit collision suffix without overwriting existing content.
+                collisionNumber++;
             }
         }
     }
@@ -252,7 +254,8 @@ public sealed class DocumentExportService
         };
         var fileName = FileNameUtilities.SanitizeFileName(article.Title) + extension;
 
-        for (var collisionNumber = 1; ; collisionNumber++)
+        var collisionNumber = 1;
+        while (true)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var candidate = FileNameUtilities.GetCollisionPath(directoryPath, fileName, collisionNumber);
@@ -273,6 +276,7 @@ public sealed class DocumentExportService
             catch (IOException) when (File.Exists(candidate))
             {
                 // Try the next explicit collision suffix without overwriting existing content.
+                collisionNumber++;
             }
         }
     }

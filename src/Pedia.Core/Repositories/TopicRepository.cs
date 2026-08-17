@@ -1,10 +1,15 @@
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.Sqlite;
 using Pedia.Core.Data;
 using Pedia.Core.Models;
 
 namespace Pedia.Core.Repositories;
 
+[SuppressMessage(
+    "Maintainability",
+    "S1192",
+    Justification = "SQLite parameter names intentionally match the placeholders in their SQL statements.")]
 public sealed class TopicRepository
 {
     private readonly SqliteConnectionFactory _connections;

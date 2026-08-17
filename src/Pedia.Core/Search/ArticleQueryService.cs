@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.Sqlite;
 using Pedia.Core.Data;
 using Pedia.Core.Models;
@@ -20,6 +21,10 @@ public sealed class ArticleQueryService : IArticleQueryService
         _connections = connections ?? throw new ArgumentNullException(nameof(connections));
     }
 
+    [SuppressMessage(
+        "Security",
+        "S2077",
+        Justification = "The SQL fragments are selected from internal constant whitelists; all external values are parameters.")]
     public async Task<ArticlePage> QueryAsync(
         ArticleQuery query,
         CancellationToken cancellationToken = default)
@@ -168,77 +173,127 @@ public sealed class ArticleQueryService : IArticleQueryService
             ? "FROM SearchDocumentsFts JOIN Articles a ON a.Id = SearchDocumentsFts.rowid"
             : "FROM Articles a";
 
-        if (useFts)
-        {
-            conditions.Add("SearchDocumentsFts MATCH $ftsQuery");
-            parameters.Add(new("$ftsQuery", ftsQuery!));
-        }
-        else if (!string.IsNullOrEmpty(searchText))
-        {
-            var fallbackParameter = query.SearchScope == ArticleSearchScope.AllText
-                ? "$allTextFallback"
-                : "$titleFallback";
-            conditions.Add(query.SearchScope == ArticleSearchScope.AllText
-                ? """
-                  (
-                      a.Title LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
-                      OR a.Subtitle LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
-                      OR a.Summary LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
-                      OR a.Notes LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
-                      OR EXISTS(
-                          SELECT 1
-                          FROM ArticleSections sectionFallback
-                          WHERE sectionFallback.ArticleId = a.Id
-                            AND (
-                                sectionFallback.Heading LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
-                                OR sectionFallback.Body LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
-                            )
-                      )
-                      OR EXISTS(
-                          SELECT 1
-                          FROM ArticleSources sourceFallback
-                          WHERE sourceFallback.ArticleId = a.Id
-                            AND (
-                                sourceFallback.Title LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
-                                OR sourceFallback.AttributionText LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
-                                OR sourceFallback.Notes LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
-                            )
-                      )
-                  )
-                  """
-                : "a.Title LIKE $titleFallback ESCAPE '\\' COLLATE NOCASE");
-            parameters.Add(new(fallbackParameter, "%" + EscapeLike(searchText) + "%"));
-        }
-
-        if (query.View == ArticleSmartView.Trash)
-        {
-            conditions.Add("a.DeletedAtUtc IS NOT NULL");
-        }
-        else
-        {
-            conditions.Add("a.DeletedAtUtc IS NULL");
-            if (query.View == ArticleSmartView.Favorites)
-            {
-                conditions.Add("a.IsFavorite = 1");
-            }
-            else if (query.View == ArticleSmartView.Uncategorized)
-            {
-                conditions.Add("NOT EXISTS(SELECT 1 FROM ArticleTopics uncategorized WHERE uncategorized.ArticleId = a.Id)");
-            }
-        }
-
-        if (query.TopicId is not null)
-        {
-            conditions.Add(query.IncludeDescendantTopics
-                ? "EXISTS(SELECT 1 FROM ArticleTopics assignment WHERE assignment.ArticleId = a.Id AND assignment.TopicId IN (SELECT Id FROM TopicScope))"
-                : "EXISTS(SELECT 1 FROM ArticleTopics assignment WHERE assignment.ArticleId = a.Id AND assignment.TopicId = $topicId)");
-            parameters.Add(new("$topicId", query.TopicId.Value));
-        }
+        AddSearchFilter(query, conditions, parameters, searchText, ftsQuery, useFts);
+        AddViewFilter(query, conditions);
+        AddTopicFilter(query, conditions, parameters);
 
         AddLanguageFilter(conditions, parameters, query.LanguageCodes);
         AddInFilter(conditions, parameters, "a.ArticleType", "type", query.ArticleTypes);
         AddInFilter(conditions, parameters, "a.Status", "status", query.Statuses);
 
+        AddOptionalFilters(query, conditions, parameters);
+
+        var rankExpression = useFts
+            ? "bm25(SearchDocumentsFts, 0.0, 12.0, 5.0, 3.0, 1.0, 0.8, 0.5)"
+            : "NULL";
+        var snippetExpression = useFts
+            ? "snippet(SearchDocumentsFts, -1, '[', ']', ' … ', 24)"
+            : "NULL";
+        var orderBy = CreateOrderBy(query, useFts, rankExpression);
+        return new QuerySql(
+            withClause,
+            fromClause,
+            string.Join(" AND ", conditions),
+            snippetExpression,
+            rankExpression,
+            orderBy,
+            parameters);
+    }
+
+    private static void AddSearchFilter(
+        ArticleQuery query,
+        List<string> conditions,
+        List<QueryParameter> parameters,
+        string? searchText,
+        string? ftsQuery,
+        bool useFts)
+    {
+        if (useFts)
+        {
+            conditions.Add("SearchDocumentsFts MATCH $ftsQuery");
+            parameters.Add(new("$ftsQuery", ftsQuery!));
+            return;
+        }
+
+        if (string.IsNullOrEmpty(searchText))
+        {
+            return;
+        }
+
+        var allText = query.SearchScope == ArticleSearchScope.AllText;
+        var fallbackParameter = allText ? "$allTextFallback" : "$titleFallback";
+        conditions.Add(allText
+            ? """
+              (
+                  a.Title LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
+                  OR a.Subtitle LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
+                  OR a.Summary LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
+                  OR a.Notes LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
+                  OR EXISTS(
+                      SELECT 1
+                      FROM ArticleSections sectionFallback
+                      WHERE sectionFallback.ArticleId = a.Id
+                        AND (
+                            sectionFallback.Heading LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
+                            OR sectionFallback.Body LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
+                        )
+                  )
+                  OR EXISTS(
+                      SELECT 1
+                      FROM ArticleSources sourceFallback
+                      WHERE sourceFallback.ArticleId = a.Id
+                        AND (
+                            sourceFallback.Title LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
+                            OR sourceFallback.AttributionText LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
+                            OR sourceFallback.Notes LIKE $allTextFallback ESCAPE '\' COLLATE NOCASE
+                        )
+                  )
+              )
+              """
+            : "a.Title LIKE $titleFallback ESCAPE '\\' COLLATE NOCASE");
+        parameters.Add(new(fallbackParameter, "%" + EscapeLike(searchText) + "%"));
+    }
+
+    private static void AddViewFilter(ArticleQuery query, List<string> conditions)
+    {
+        if (query.View == ArticleSmartView.Trash)
+        {
+            conditions.Add("a.DeletedAtUtc IS NOT NULL");
+            return;
+        }
+
+        conditions.Add("a.DeletedAtUtc IS NULL");
+        if (query.View == ArticleSmartView.Favorites)
+        {
+            conditions.Add("a.IsFavorite = 1");
+        }
+        else if (query.View == ArticleSmartView.Uncategorized)
+        {
+            conditions.Add("NOT EXISTS(SELECT 1 FROM ArticleTopics uncategorized WHERE uncategorized.ArticleId = a.Id)");
+        }
+    }
+
+    private static void AddTopicFilter(
+        ArticleQuery query,
+        List<string> conditions,
+        List<QueryParameter> parameters)
+    {
+        if (query.TopicId is null)
+        {
+            return;
+        }
+
+        conditions.Add(query.IncludeDescendantTopics
+            ? "EXISTS(SELECT 1 FROM ArticleTopics assignment WHERE assignment.ArticleId = a.Id AND assignment.TopicId IN (SELECT Id FROM TopicScope))"
+            : "EXISTS(SELECT 1 FROM ArticleTopics assignment WHERE assignment.ArticleId = a.Id AND assignment.TopicId = $topicId)");
+        parameters.Add(new("$topicId", query.TopicId.Value));
+    }
+
+    private static void AddOptionalFilters(
+        ArticleQuery query,
+        List<string> conditions,
+        List<QueryParameter> parameters)
+    {
         if (query.IsFavorite is not null)
         {
             conditions.Add("a.IsFavorite = $isFavorite");
@@ -270,22 +325,6 @@ public sealed class ArticleQueryService : IArticleQueryService
             conditions.Add("a.IsSample = $isSample");
             parameters.Add(new("$isSample", query.IsSample.Value));
         }
-
-        var rankExpression = useFts
-            ? "bm25(SearchDocumentsFts, 0.0, 12.0, 5.0, 3.0, 1.0, 0.8, 0.5)"
-            : "NULL";
-        var snippetExpression = useFts
-            ? "snippet(SearchDocumentsFts, -1, '[', ']', ' … ', 24)"
-            : "NULL";
-        var orderBy = CreateOrderBy(query, useFts, rankExpression);
-        return new QuerySql(
-            withClause,
-            fromClause,
-            string.Join(" AND ", conditions),
-            snippetExpression,
-            rankExpression,
-            orderBy,
-            parameters);
     }
 
     private static string CreateOrderBy(ArticleQuery query, bool useFts, string rankExpression)
@@ -315,8 +354,8 @@ public sealed class ArticleQueryService : IArticleQueryService
     }
 
     private static void AddInFilter(
-        ICollection<string> conditions,
-        ICollection<QueryParameter> parameters,
+        List<string> conditions,
+        List<QueryParameter> parameters,
         string column,
         string prefix,
         IReadOnlyCollection<string>? values)
@@ -339,8 +378,8 @@ public sealed class ArticleQueryService : IArticleQueryService
     }
 
     private static void AddLanguageFilter(
-        ICollection<string> conditions,
-        ICollection<QueryParameter> parameters,
+        List<string> conditions,
+        List<QueryParameter> parameters,
         IReadOnlyCollection<string>? languageCodes)
     {
         if (languageCodes is null || languageCodes.Count == 0)
@@ -372,8 +411,8 @@ public sealed class ArticleQueryService : IArticleQueryService
     }
 
     private static void AddRangeFilter<T>(
-        ICollection<string> conditions,
-        ICollection<QueryParameter> parameters,
+        List<string> conditions,
+        List<QueryParameter> parameters,
         string column,
         string name,
         string comparison,
@@ -389,8 +428,8 @@ public sealed class ArticleQueryService : IArticleQueryService
     }
 
     private static void AddDateFilter(
-        ICollection<string> conditions,
-        ICollection<QueryParameter> parameters,
+        List<string> conditions,
+        List<QueryParameter> parameters,
         string column,
         string name,
         string comparison,

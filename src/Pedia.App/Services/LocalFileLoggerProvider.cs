@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Pedia.Services;
 
-public sealed class LocalFileLoggerProvider : ILoggerProvider
+public sealed partial class LocalFileLoggerProvider : ILoggerProvider
 {
     private readonly object _sync = new();
     private readonly string _logPath;

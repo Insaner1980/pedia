@@ -9,10 +9,7 @@ public sealed class ImportPreviewService
 
     public ImportPreviewService(long maximumFileBytes = 16 * 1024 * 1024)
     {
-        if (maximumFileBytes < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maximumFileBytes));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(maximumFileBytes, 1);
 
         _maximumFileBytes = maximumFileBytes;
     }

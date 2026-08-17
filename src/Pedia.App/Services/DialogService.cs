@@ -9,6 +9,7 @@ namespace Pedia.Services;
 
 public sealed class DialogService(IStringService strings) : IDialogService
 {
+    private const string CancelButtonTextKey = "CancelButtonText";
     private XamlRoot? _xamlRoot;
 
     public void AttachXamlRoot(XamlRoot xamlRoot) => _xamlRoot = xamlRoot;
@@ -38,7 +39,7 @@ public sealed class DialogService(IStringService strings) : IDialogService
             MaxWidth = 520
         };
         dialog.PrimaryButtonText = primaryButtonText;
-        dialog.CloseButtonText = strings.Get("CancelButtonText");
+        dialog.CloseButtonText = strings.Get(CancelButtonTextKey);
         dialog.DefaultButton = ContentDialogButton.Close;
         return await dialog.ShowAsync() == ContentDialogResult.Primary;
     }
@@ -54,7 +55,7 @@ public sealed class DialogService(IStringService strings) : IDialogService
         };
         dialog.PrimaryButtonText = strings.Get("SaveButtonText");
         dialog.SecondaryButtonText = strings.Get("DiscardButtonText");
-        dialog.CloseButtonText = strings.Get("CancelButtonText");
+        dialog.CloseButtonText = strings.Get(CancelButtonTextKey);
         dialog.DefaultButton = ContentDialogButton.Primary;
         return await dialog.ShowAsync() switch
         {
@@ -100,7 +101,7 @@ public sealed class DialogService(IStringService strings) : IDialogService
         var dialog = CreateDialog(title);
         dialog.Content = panel;
         dialog.PrimaryButtonText = strings.Get("SaveButtonText");
-        dialog.CloseButtonText = strings.Get("CancelButtonText");
+        dialog.CloseButtonText = strings.Get(CancelButtonTextKey);
         dialog.DefaultButton = ContentDialogButton.Primary;
         dialog.PrimaryButtonClick += (_, args) =>
         {
@@ -139,7 +140,7 @@ public sealed class DialogService(IStringService strings) : IDialogService
         var dialog = CreateDialog(title);
         dialog.Content = panel;
         dialog.PrimaryButtonText = strings.Get("ContinueButtonText");
-        dialog.CloseButtonText = strings.Get("CancelButtonText");
+        dialog.CloseButtonText = strings.Get(CancelButtonTextKey);
         dialog.DefaultButton = ContentDialogButton.Primary;
         var currentTopicId = selectedTopicId;
         var rebuilding = false;
@@ -193,7 +194,7 @@ public sealed class DialogService(IStringService strings) : IDialogService
         var dialog = CreateDialog(strings.Get("AssignTopicsTitle"));
         dialog.Content = panel;
         dialog.PrimaryButtonText = strings.Get("SaveButtonText");
-        dialog.CloseButtonText = strings.Get("CancelButtonText");
+        dialog.CloseButtonText = strings.Get(CancelButtonTextKey);
         dialog.DefaultButton = ContentDialogButton.Primary;
 
         void RebuildTree()
@@ -321,143 +322,30 @@ public sealed class DialogService(IStringService strings) : IDialogService
         dialog.MaxWidth = 1080;
         dialog.Content = panel;
         dialog.PrimaryButtonText = strings.Get("ImportButtonText");
-        dialog.CloseButtonText = strings.Get("CancelButtonText");
+        dialog.CloseButtonText = strings.Get(CancelButtonTextKey);
         dialog.DefaultButton = ContentDialogButton.Primary;
 
-        var columnWidths = new[] { 150d, 90d, 180d, 160d, 110d, 80d, 110d, 220d };
-        var primaryTextBrush = (Brush)Application.Current.Resources["PediaPrimaryTextBrush"];
-        var secondaryTextBrush = (Brush)Application.Current.Resources["PediaSecondaryTextBrush"];
-        var elevatedSurfaceBrush = (Brush)Application.Current.Resources["PediaElevatedSurfaceBrush"];
-        var dividerBrush = (Brush)Application.Current.Resources["PediaSubtleDividerBrush"];
-
-        ListViewItem CreateRow(IReadOnlyList<string> values, bool isHeader, string? filePath = null)
+        var context = new ImportPreviewContext
         {
-            var row = new Grid
-            {
-                Width = columnWidths.Sum(),
-                Background = isHeader ? elevatedSurfaceBrush : null
-            };
-            foreach (var width in columnWidths)
-            {
-                row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(width) });
-            }
+            Preview = preview,
+            TopicBox = topicBox,
+            StatusBox = statusBox,
+            DuplicateBox = duplicateBox,
+            Summary = summary,
+            PreviewList = previewList,
+            Dialog = dialog,
+            RowStyle = new PreviewRowStyle(
+                [150d, 90d, 180d, 160d, 110d, 80d, 110d, 220d],
+                (Brush)Application.Current.Resources["PediaPrimaryTextBrush"],
+                (Brush)Application.Current.Resources["PediaSecondaryTextBrush"],
+                (Brush)Application.Current.Resources["PediaElevatedSurfaceBrush"],
+                (Brush)Application.Current.Resources["PediaSubtleDividerBrush"])
+        };
 
-            for (var column = 0; column < values.Count; column++)
-            {
-                var text = new TextBlock
-                {
-                    Text = values[column],
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Foreground = isHeader ? secondaryTextBrush : primaryTextBrush,
-                    FontWeight = isHeader ? Microsoft.UI.Text.FontWeights.SemiBold : Microsoft.UI.Text.FontWeights.Normal
-                };
-                if (!isHeader)
-                {
-                    ToolTipService.SetToolTip(text, column == 0 ? filePath : values[column]);
-                }
-
-                var cell = new Border
-                {
-                    Padding = new Thickness(8, 0, 8, 0),
-                    BorderBrush = dividerBrush,
-                    BorderThickness = new Thickness(0, 0, column == values.Count - 1 ? 0 : 1, 1),
-                    Child = text
-                };
-                Grid.SetColumn(cell, column);
-                row.Children.Add(cell);
-            }
-
-            return new ListViewItem
-            {
-                Content = row,
-                Padding = new Thickness(0),
-                MinHeight = isHeader ? 34 : 40,
-                HorizontalContentAlignment = HorizontalAlignment.Left,
-                IsTabStop = false
-            };
-        }
-
-        ImportDuplicateHandling GetDuplicateHandling() =>
-            duplicateBox.SelectedItem is KeyValuePair<ImportDuplicateHandling, string> option
-                ? option.Key
-                : ImportDuplicateHandling.Skip;
-
-        ImportPreviewAction GetAction(ImportPreviewItem item, ImportDuplicateHandling duplicateHandling) => item.Error is not null
-            ? ImportPreviewAction.Failed
-            : !item.HasTitleConflict
-                ? ImportPreviewAction.Import
-                : duplicateHandling switch
-                {
-                    ImportDuplicateHandling.CreateCopy => ImportPreviewAction.CreateCopy,
-                    ImportDuplicateHandling.Replace => ImportPreviewAction.Replace,
-                    _ => ImportPreviewAction.Skip
-                };
-
-        string GetActionText(ImportPreviewAction action) => strings.Get(action switch
-        {
-            ImportPreviewAction.Import => "ImportActionImport",
-            ImportPreviewAction.CreateCopy => "ImportActionCreateCopy",
-            ImportPreviewAction.Replace => "ImportActionReplace",
-            ImportPreviewAction.Skip => "ImportActionSkip",
-            _ => "ImportActionFailed"
-        });
-
-        void RefreshPreview()
-        {
-            var target = (topicBox.SelectedItem as ImportDestinationOption)?.Label
-                ?? strings.Get("UncategorizedOption");
-            var status = (statusBox.SelectedItem as ValueLabelOption)?.Label ?? strings.Get("DraftStatus");
-            var duplicateHandling = GetDuplicateHandling();
-            var actions = preview.Items.Select(item => GetAction(item, duplicateHandling)).ToArray();
-
-            summary.Text = strings.Format(
-                "ImportPreviewSummaryFormat",
-                preview.Items.Count,
-                actions.Count(action => action == ImportPreviewAction.Import),
-                actions.Count(action => action == ImportPreviewAction.CreateCopy),
-                actions.Count(action => action == ImportPreviewAction.Replace),
-                actions.Count(action => action == ImportPreviewAction.Skip),
-                actions.Count(action => action == ImportPreviewAction.Failed));
-            dialog.IsPrimaryButtonEnabled = actions.Any(action =>
-                action is ImportPreviewAction.Import or ImportPreviewAction.CreateCopy or ImportPreviewAction.Replace);
-
-            previewList.Items.Clear();
-            previewList.Items.Add(CreateRow(
-                [
-                    strings.Get("FileColumnText"),
-                    strings.Get("TypeColumnText"),
-                    strings.Get("TitleColumnText"),
-                    strings.Get("TargetColumnText"),
-                    strings.Get("StatusColumnText"),
-                    strings.Get("ConflictColumnText"),
-                    strings.Get("ActionColumnText"),
-                    strings.Get("ErrorColumnText")
-                ],
-                isHeader: true));
-            for (var index = 0; index < preview.Items.Count; index++)
-            {
-                var item = preview.Items[index];
-                previewList.Items.Add(CreateRow(
-                    [
-                        item.FileName,
-                        item.Format,
-                        item.ProposedTitle,
-                        target,
-                        status,
-                        strings.Get(item.HasTitleConflict ? "YesText" : "NoText"),
-                        GetActionText(actions[index]),
-                        item.Error ?? strings.Get("NoneText")
-                    ],
-                    isHeader: false,
-                    filePath: item.FilePath));
-            }
-        }
-
-        topicBox.SelectionChanged += (_, _) => RefreshPreview();
-        statusBox.SelectionChanged += (_, _) => RefreshPreview();
-        duplicateBox.SelectionChanged += (_, _) => RefreshPreview();
-        RefreshPreview();
+        topicBox.SelectionChanged += (_, _) => RefreshImportPreview(context);
+        statusBox.SelectionChanged += (_, _) => RefreshImportPreview(context);
+        duplicateBox.SelectionChanged += (_, _) => RefreshImportPreview(context);
+        RefreshImportPreview(context);
 
         if (await dialog.ShowAsync() != ContentDialogResult.Primary)
         {
@@ -468,7 +356,7 @@ public sealed class DialogService(IStringService strings) : IDialogService
             (topicBox.SelectedItem as ImportDestinationOption)?.TopicId,
             string.IsNullOrWhiteSpace(languageBox.Text) ? "en" : languageBox.Text.Trim(),
             (statusBox.SelectedItem as ValueLabelOption)?.Value ?? "Draft",
-            GetDuplicateHandling());
+            GetDuplicateHandling(duplicateBox));
 
         if (result.DuplicateHandling == ImportDuplicateHandling.Replace &&
             !await ConfirmAsync(
@@ -500,7 +388,7 @@ public sealed class DialogService(IStringService strings) : IDialogService
         var dialog = CreateDialog(strings.Get("ExportArticleTitle"));
         dialog.Content = formatBox;
         dialog.PrimaryButtonText = strings.Get("ContinueButtonText");
-        dialog.CloseButtonText = strings.Get("CancelButtonText");
+        dialog.CloseButtonText = strings.Get(CancelButtonTextKey);
         dialog.DefaultButton = ContentDialogButton.Primary;
 
         if (await dialog.ShowAsync() != ContentDialogResult.Primary)
@@ -537,7 +425,7 @@ public sealed class DialogService(IStringService strings) : IDialogService
         var dialog = CreateDialog(strings.Get("ChangeArticleStatusTitle"));
         dialog.Content = statusBox;
         dialog.PrimaryButtonText = strings.Get("ApplyButtonText");
-        dialog.CloseButtonText = strings.Get("CancelButtonText");
+        dialog.CloseButtonText = strings.Get(CancelButtonTextKey);
         dialog.DefaultButton = ContentDialogButton.Primary;
 
         return await dialog.ShowAsync() == ContentDialogResult.Primary
@@ -545,7 +433,148 @@ public sealed class DialogService(IStringService strings) : IDialogService
             : null;
     }
 
-    private static IReadOnlyDictionary<long, TreeViewNode> PopulateTopicTree(
+    private void RefreshImportPreview(ImportPreviewContext context)
+    {
+        var target = (context.TopicBox.SelectedItem as ImportDestinationOption)?.Label
+            ?? strings.Get("UncategorizedOption");
+        var status = (context.StatusBox.SelectedItem as ValueLabelOption)?.Label ?? strings.Get("DraftStatus");
+        var duplicateHandling = GetDuplicateHandling(context.DuplicateBox);
+        var actions = context.Preview.Items.Select(item => GetAction(item, duplicateHandling)).ToArray();
+
+        context.Summary.Text = strings.Format(
+            "ImportPreviewSummaryFormat",
+            context.Preview.Items.Count,
+            actions.Count(action => action == ImportPreviewAction.Import),
+            actions.Count(action => action == ImportPreviewAction.CreateCopy),
+            actions.Count(action => action == ImportPreviewAction.Replace),
+            actions.Count(action => action == ImportPreviewAction.Skip),
+            actions.Count(action => action == ImportPreviewAction.Failed));
+        context.Dialog.IsPrimaryButtonEnabled = actions.Any(action =>
+            action is ImportPreviewAction.Import or ImportPreviewAction.CreateCopy or ImportPreviewAction.Replace);
+
+        context.PreviewList.Items.Clear();
+        context.PreviewList.Items.Add(CreateImportPreviewRow(
+            [
+                strings.Get("FileColumnText"),
+                strings.Get("TypeColumnText"),
+                strings.Get("TitleColumnText"),
+                strings.Get("TargetColumnText"),
+                strings.Get("StatusColumnText"),
+                strings.Get("ConflictColumnText"),
+                strings.Get("ActionColumnText"),
+                strings.Get("ErrorColumnText")
+            ],
+            isHeader: true,
+            style: context.RowStyle));
+        for (var index = 0; index < context.Preview.Items.Count; index++)
+        {
+            var item = context.Preview.Items[index];
+            context.PreviewList.Items.Add(CreateImportPreviewRow(
+                [
+                    item.FileName,
+                    item.Format,
+                    item.ProposedTitle,
+                    target,
+                    status,
+                    strings.Get(item.HasTitleConflict ? "YesText" : "NoText"),
+                    GetActionText(actions[index]),
+                    item.Error ?? strings.Get("NoneText")
+                ],
+                isHeader: false,
+                style: context.RowStyle,
+                filePath: item.FilePath));
+        }
+    }
+
+    private static ListViewItem CreateImportPreviewRow(
+        IReadOnlyList<string> values,
+        bool isHeader,
+        PreviewRowStyle style,
+        string? filePath = null)
+    {
+        var row = new Grid
+        {
+            Width = style.ColumnWidths.Sum(),
+            Background = isHeader ? style.ElevatedSurfaceBrush : null
+        };
+        foreach (var width in style.ColumnWidths)
+        {
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(width) });
+        }
+
+        for (var column = 0; column < values.Count; column++)
+        {
+            var text = new TextBlock
+            {
+                Text = values[column],
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = isHeader ? style.SecondaryTextBrush : style.PrimaryTextBrush,
+                FontWeight = isHeader ? Microsoft.UI.Text.FontWeights.SemiBold : Microsoft.UI.Text.FontWeights.Normal
+            };
+            if (!isHeader)
+            {
+                ToolTipService.SetToolTip(text, column == 0 ? filePath : values[column]);
+            }
+
+            var cell = new Border
+            {
+                Padding = new Thickness(8, 0, 8, 0),
+                BorderBrush = style.DividerBrush,
+                BorderThickness = new Thickness(0, 0, column == values.Count - 1 ? 0 : 1, 1),
+                Child = text
+            };
+            Grid.SetColumn(cell, column);
+            row.Children.Add(cell);
+        }
+
+        return new ListViewItem
+        {
+            Content = row,
+            Padding = new Thickness(0),
+            MinHeight = isHeader ? 34 : 40,
+            HorizontalContentAlignment = HorizontalAlignment.Left,
+            IsTabStop = false
+        };
+    }
+
+    private static ImportDuplicateHandling GetDuplicateHandling(ComboBox duplicateBox) =>
+        duplicateBox.SelectedItem is KeyValuePair<ImportDuplicateHandling, string> option
+            ? option.Key
+            : ImportDuplicateHandling.Skip;
+
+    private static ImportPreviewAction GetAction(
+        ImportPreviewItem item,
+        ImportDuplicateHandling duplicateHandling)
+    {
+        if (item.Error is not null)
+        {
+            return ImportPreviewAction.Failed;
+        }
+
+        if (!item.HasTitleConflict)
+        {
+            return ImportPreviewAction.Import;
+        }
+
+        return duplicateHandling switch
+        {
+            ImportDuplicateHandling.CreateCopy => ImportPreviewAction.CreateCopy,
+            ImportDuplicateHandling.Replace => ImportPreviewAction.Replace,
+            _ => ImportPreviewAction.Skip
+        };
+    }
+
+    private string GetActionText(ImportPreviewAction action) => strings.Get(action switch
+    {
+        ImportPreviewAction.Import => "ImportActionImport",
+        ImportPreviewAction.CreateCopy => "ImportActionCreateCopy",
+        ImportPreviewAction.Replace => "ImportActionReplace",
+        ImportPreviewAction.Skip => "ImportActionSkip",
+        _ => "ImportActionFailed"
+    });
+
+    private static Dictionary<long, TreeViewNode> PopulateTopicTree(
         TreeView tree,
         IReadOnlyList<TopicNodeViewModel> topics,
         string searchText,
@@ -598,6 +627,25 @@ public sealed class DialogService(IStringService strings) : IDialogService
 
         return nodes;
     }
+
+    private sealed class ImportPreviewContext
+    {
+        public required ImportPreviewResult Preview { get; init; }
+        public required ComboBox TopicBox { get; init; }
+        public required ComboBox StatusBox { get; init; }
+        public required ComboBox DuplicateBox { get; init; }
+        public required TextBlock Summary { get; init; }
+        public required ListView PreviewList { get; init; }
+        public required ContentDialog Dialog { get; init; }
+        public required PreviewRowStyle RowStyle { get; init; }
+    }
+
+    private sealed record PreviewRowStyle(
+        double[] ColumnWidths,
+        Brush PrimaryTextBrush,
+        Brush SecondaryTextBrush,
+        Brush ElevatedSurfaceBrush,
+        Brush DividerBrush);
 
     private static TextBlock CreateTopicLabel(TopicNodeViewModel topic)
     {

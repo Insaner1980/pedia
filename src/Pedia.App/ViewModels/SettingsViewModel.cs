@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -83,6 +84,14 @@ public sealed partial class SettingsViewModel : ObservableObject
     public string TopicCount => Statistics?.TopicCount.ToString("N0") ?? string.Empty;
     public string SourceCount => Statistics?.SourceCount.ToString("N0") ?? string.Empty;
     public string SearchIndexState => Statistics?.SearchIndexState ?? string.Empty;
+    [SuppressMessage(
+        "Maintainability",
+        "S2325",
+        Justification = "WinUI binds this value through the view-model instance.")]
+    [SuppressMessage(
+        "Performance",
+        "CA1822",
+        Justification = "WinUI binds this value through the view-model instance.")]
     public string VersionText => typeof(App).Assembly.GetName().Version?.ToString(3) ?? "1.0.0";
 
     public void Load(LibraryStatistics statistics)

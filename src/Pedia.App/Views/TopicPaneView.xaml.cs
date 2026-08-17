@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Pedia.ViewModels;
@@ -145,34 +146,45 @@ public sealed partial class TopicPaneView : UserControl
         switch (action)
         {
             case "new-child":
-                if (ViewModel.CreateChildTopicCommand.CanExecute(null)) ViewModel.CreateChildTopicCommand.Execute(null);
+                await ExecuteIfAvailableAsync(ViewModel.CreateChildTopicCommand);
                 break;
             case "rename":
-                if (ViewModel.RenameTopicCommand.CanExecute(null)) ViewModel.RenameTopicCommand.Execute(null);
+                await ExecuteIfAvailableAsync(ViewModel.RenameTopicCommand);
                 break;
             case "move":
-                if (ViewModel.MoveTopicCommand.CanExecute(null)) ViewModel.MoveTopicCommand.Execute(null);
+                await ExecuteIfAvailableAsync(ViewModel.MoveTopicCommand);
                 break;
             case "move-up":
-                if (ViewModel.MoveTopicUpCommand.CanExecute(null)) ViewModel.MoveTopicUpCommand.Execute(null);
+                await ExecuteIfAvailableAsync(ViewModel.MoveTopicUpCommand);
                 break;
             case "move-down":
-                if (ViewModel.MoveTopicDownCommand.CanExecute(null)) ViewModel.MoveTopicDownCommand.Execute(null);
+                await ExecuteIfAvailableAsync(ViewModel.MoveTopicDownCommand);
                 break;
             case "expand":
-                if (ViewModel.ExpandDescendantsCommand.CanExecute(null)) ViewModel.ExpandDescendantsCommand.Execute(null);
+                ExecuteIfAvailable(ViewModel.ExpandDescendantsCommand);
                 break;
             case "collapse":
-                if (ViewModel.CollapseDescendantsCommand.CanExecute(null)) ViewModel.CollapseDescendantsCommand.Execute(null);
+                ExecuteIfAvailable(ViewModel.CollapseDescendantsCommand);
                 break;
             case "copy-path":
-                if (ViewModel.CopyTopicPathCommand.CanExecute(null)) ViewModel.CopyTopicPathCommand.Execute(null);
+                ExecuteIfAvailable(ViewModel.CopyTopicPathCommand);
                 break;
             case "delete":
-                if (ViewModel.DeleteTopicCommand.CanExecute(null)) ViewModel.DeleteTopicCommand.Execute(null);
+                await ExecuteIfAvailableAsync(ViewModel.DeleteTopicCommand);
                 break;
         }
     }
+
+    private static void ExecuteIfAvailable(IRelayCommand command)
+    {
+        if (command.CanExecute(null))
+        {
+            command.Execute(null);
+        }
+    }
+
+    private static Task ExecuteIfAvailableAsync(IAsyncRelayCommand command) =>
+        command.CanExecute(null) ? command.ExecuteAsync(null) : Task.CompletedTask;
 
     private void OnCollapsePaneClick(object sender, RoutedEventArgs e) => CollapseRequested?.Invoke(this, EventArgs.Empty);
 }

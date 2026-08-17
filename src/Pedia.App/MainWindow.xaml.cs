@@ -14,8 +14,6 @@ namespace Pedia;
 
 public sealed partial class MainWindow : Window
 {
-    private const int DefaultWidth = 1600;
-    private const int DefaultHeight = 950;
     private const int MinimumWidth = 1180;
     private const int MinimumHeight = 710;
 
@@ -26,8 +24,8 @@ public sealed partial class MainWindow : Window
     private bool _closeHandled;
     private bool _restored;
 
-    [DllImport("user32.dll")]
-    private static extern uint GetDpiForWindow(nint hwnd);
+    [LibraryImport("user32.dll")]
+    private static partial uint GetDpiForWindow(nint hwnd);
 
     public MainWindow(
         MainWindowViewModel viewModel,
@@ -190,7 +188,7 @@ public sealed partial class MainWindow : Window
         await ViewModel.SaveSessionAsync();
     }
 
-    private void OnClosed(object sender, WindowEventArgs args) => App.Current.Exit();
+    private static void OnClosed(object sender, WindowEventArgs args) => App.Current.Exit();
 
     private void OnAppWindowChanged(AppWindow sender, AppWindowChangedEventArgs args)
     {

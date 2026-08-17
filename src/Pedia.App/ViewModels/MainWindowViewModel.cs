@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -22,6 +23,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public Action<bool>? DensityChanged { get; set; }
 
+    [SuppressMessage(
+        "Maintainability",
+        "S107",
+        Justification = "The dependency-injection constructor explicitly declares the window coordinator's required collaborators.")]
     public MainWindowViewModel(
         IPediaDataService dataService,
         ISettingsService settingsService,
@@ -142,18 +147,20 @@ public sealed partial class MainWindowViewModel : ObservableObject
         SearchIndexStateText = _strings.Get("PreparingSearchIndexText");
         try
         {
-            await _settingsService.LoadAsync();
+            await _settingsService.LoadAsync(CancellationToken.None);
             _lastIncludeSubtopicsDefault = _settingsService.Current.IncludeSubtopicsByDefault;
             DensityChanged?.Invoke(_settingsService.Current.CompactDensity);
-            await _dataService.InitializeAsync();
+            await _dataService.InitializeAsync(CancellationToken.None);
             var state = _settingsService.Current.Window;
             Browser.RestoreFilterState(state);
-            await Topics.LoadAsync(_dataService.IsNewDatabase ? null : state.SelectedTopicId);
+            await Topics.LoadAsync(
+                _dataService.IsNewDatabase ? null : state.SelectedTopicId,
+                CancellationToken.None);
             var scope = _dataService.IsNewDatabase
                 ? Topics.UserTopics.FirstOrDefault(topic => topic.Name.Equals("History of Shanghai", StringComparison.OrdinalIgnoreCase))
                     ?? Topics.SelectedNode
-                    ?? Topics.RootNodes.First()
-                : Topics.SelectedNode ?? Topics.RootNodes.First();
+                    ?? Topics.RootNodes[0]
+                : Topics.SelectedNode ?? Topics.RootNodes[0];
             Topics.SelectedNode = scope;
             await Browser.InitializeAsync(
                 scope,
@@ -166,7 +173,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
                 && Browser.Articles.FirstOrDefault(article => article.Title.Equals("History of Shanghai", StringComparison.OrdinalIgnoreCase)) is { } firstArticle)
             {
                 Browser.SelectArticleById(firstArticle.Id);
-                await Detail.LoadArticleAsync(firstArticle.Id);
+                await Detail.LoadArticleAsync(firstArticle.Id, CancellationToken.None);
             }
             await RefreshStatisticsAsync();
             DatabaseStateText = _strings.Get("DatabaseReadyText");
@@ -195,7 +202,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         state.SearchQuery = Browser.SearchText;
         state.IncludeSubtopics = _pendingIncludeSubtopicsDefault ?? Browser.IncludeSubtopics;
         Browser.SaveFilterState(state);
-        await _settingsService.SaveAsync().ConfigureAwait(false);
+        await _settingsService.SaveAsync(CancellationToken.None).ConfigureAwait(false);
     }
 
     [RelayCommand(CanExecute = nameof(CanUseTitleBarCommands))]
@@ -237,7 +244,6 @@ public sealed partial class MainWindowViewModel : ObservableObject
                 return;
             }
 
-            _importCancellation?.Dispose();
             _importCancellation = new CancellationTokenSource();
             IsImporting = true;
             var preview = await _dataService.PreviewImportAsync(files, _importCancellation.Token);
@@ -375,7 +381,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        await Detail.LoadArticleAsync(article.Id);
+        await Detail.LoadArticleAsync(article.Id, CancellationToken.None);
     }
 
     private async Task OnArticleActionRequestedAsync(ArticleRowViewModel article, string action)
@@ -388,7 +394,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         if (Detail.Article?.Id != article.Id)
         {
-            await Detail.LoadArticleAsync(article.Id);
+            await Detail.LoadArticleAsync(article.Id, CancellationToken.None);
             if (Detail.Article?.Id != article.Id)
             {
                 return;
@@ -398,34 +404,45 @@ public sealed partial class MainWindowViewModel : ObservableObject
         switch (action)
         {
             case "edit":
-                if (Detail.EditCommand.CanExecute(null)) Detail.EditCommand.Execute(null);
+                ExecuteIfAvailable(Detail.EditCommand);
                 break;
             case "duplicate":
-                if (Detail.DuplicateCommand.CanExecute(null)) await Detail.DuplicateCommand.ExecuteAsync(null);
+                await ExecuteIfAvailableAsync(Detail.DuplicateCommand);
                 break;
             case "add-topics":
-                if (Detail.ManageTopicsCommand.CanExecute(null)) await Detail.ManageTopicsCommand.ExecuteAsync(null);
+                await ExecuteIfAvailableAsync(Detail.ManageTopicsCommand);
                 break;
             case "remove-topic" when Browser.Scope is { IsSmart: false } topic:
                 await Detail.RemoveFromTopicAsync(topic.Id);
                 break;
             case "favorite":
-                if (Detail.ToggleFavoriteCommand.CanExecute(null)) await Detail.ToggleFavoriteCommand.ExecuteAsync(null);
+                await ExecuteIfAvailableAsync(Detail.ToggleFavoriteCommand);
                 break;
             case "export":
-                if (Detail.ExportCommand.CanExecute(null)) await Detail.ExportCommand.ExecuteAsync(null);
+                await ExecuteIfAvailableAsync(Detail.ExportCommand);
                 break;
             case "trash":
-                if (Detail.MoveToTrashCommand.CanExecute(null)) await Detail.MoveToTrashCommand.ExecuteAsync(null);
+                await ExecuteIfAvailableAsync(Detail.MoveToTrashCommand);
                 break;
             case "restore":
-                if (Detail.RestoreCommand.CanExecute(null)) await Detail.RestoreCommand.ExecuteAsync(null);
+                await ExecuteIfAvailableAsync(Detail.RestoreCommand);
                 break;
             case "delete":
-                if (Detail.DeletePermanentlyCommand.CanExecute(null)) await Detail.DeletePermanentlyCommand.ExecuteAsync(null);
+                await ExecuteIfAvailableAsync(Detail.DeletePermanentlyCommand);
                 break;
         }
     }
+
+    private static void ExecuteIfAvailable(IRelayCommand command)
+    {
+        if (command.CanExecute(null))
+        {
+            command.Execute(null);
+        }
+    }
+
+    private static Task ExecuteIfAvailableAsync(IAsyncRelayCommand command) =>
+        command.CanExecute(null) ? command.ExecuteAsync(null) : Task.CompletedTask;
 
     private async Task ExportArticlesAsync(IReadOnlyList<long> articleIds)
     {
@@ -448,7 +465,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         try
         {
-            await _dataService.ExportAsync(articleIds, format.Value, destination);
+            await _dataService.ExportAsync(articleIds, format.Value, destination, CancellationToken.None);
             ShowNotification(articleIds.Count == 1
                 ? _strings.Get("ArticleExportedText")
                 : _strings.Format("ArticlesExportedFormat", articleIds.Count));
@@ -484,7 +501,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
                         await _dataService.AddTopicsToArticlesAsync(
                             articleIds,
-                            topics.Select(topic => topic.Id).ToArray());
+                            topics.Select(topic => topic.Id).ToArray(),
+                            CancellationToken.None);
                         notification = _strings.Format("SelectedArticlesAddedToTopicsFormat", articleIds.Count);
                         break;
                     }
@@ -494,7 +512,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
                         return;
                     }
 
-                    await _dataService.RemoveTopicFromArticlesAsync(articleIds, topic.Id);
+                    await _dataService.RemoveTopicFromArticlesAsync(articleIds, topic.Id, CancellationToken.None);
                     notification = _strings.Format("SelectedArticlesRemovedFromTopicFormat", articleIds.Count);
                     break;
                 case ArticleBulkActionKind.ChangeStatus:
@@ -505,7 +523,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
                             return;
                         }
 
-                        await _dataService.SetStatusForArticlesAsync(articleIds, status);
+                        await _dataService.SetStatusForArticlesAsync(articleIds, status, CancellationToken.None);
                         notification = _strings.Format("SelectedArticlesStatusChangedFormat", articleIds.Count);
                         break;
                     }
@@ -519,7 +537,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
                         return;
                     }
 
-                    await _dataService.MoveArticlesToTrashAsync(articleIds);
+                    await _dataService.MoveArticlesToTrashAsync(articleIds, CancellationToken.None);
                     notification = _strings.Format("SelectedArticlesMovedToTrashFormat", articleIds.Count);
                     break;
                 default:
@@ -543,10 +561,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
             var currentScope = Browser.Scope;
             var selectedTopicId = currentScope?.Id;
             var selectedArticleId = Detail.Article?.Id;
-            await Topics.LoadAsync(selectedTopicId);
+            await Topics.LoadAsync(selectedTopicId, CancellationToken.None);
             var scope = Topics.SelectedNode
                 ?? (currentScope is { IsSmart: false } topic && Topics.ContainsTopic(topic.Id) ? topic : null)
-                ?? Topics.RootNodes.First();
+                ?? Topics.RootNodes[0];
             await Browser.SetScopeAsync(scope, Browser.IncludeSubtopics, selectedArticleId);
             await RefreshStatisticsAsync();
             NotifyResultCount();
@@ -562,7 +580,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     private async Task RefreshStatisticsAsync()
     {
-        Statistics = await _dataService.GetStatisticsAsync();
+        Statistics = await _dataService.GetStatisticsAsync(CancellationToken.None);
         OnPropertyChanged(nameof(ArticleCountText));
         OnPropertyChanged(nameof(TopicCountText));
         OnPropertyChanged(nameof(LastImportText));
@@ -614,7 +632,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         try
         {
-            await _dataService.EmptyTrashAsync();
+            await _dataService.EmptyTrashAsync(CancellationToken.None);
             ShowNotification(_strings.Get("TrashEmptiedText"));
             Detail.ClearArticle();
             await RefreshDataAsync();

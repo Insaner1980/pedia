@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,10 @@ using Pedia.Services;
 
 namespace Pedia.ViewModels;
 
+[SuppressMessage(
+    "Maintainability",
+    "S4144",
+    Justification = "Generated observable-property hooks intentionally perform the same filter refresh operation.")]
 public sealed partial class ArticleBrowserViewModel : ObservableObject
 {
     private readonly IPediaDataService _dataService;
@@ -112,22 +117,22 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
 
     [ObservableProperty] public partial TopicNodeViewModel? Scope { get; set; }
     [ObservableProperty] public partial string SearchText { get; set; } = string.Empty;
-    [ObservableProperty] public partial SearchScopeOption SelectedSearchScope { get; set; } = null!;
-    [ObservableProperty] public partial string SelectedLanguage { get; set; } = string.Empty;
-    [ObservableProperty] public partial ValueLabelOption SelectedArticleType { get; set; } = null!;
-    [ObservableProperty] public partial ValueLabelOption SelectedArticleStatus { get; set; } = null!;
+    [ObservableProperty] public partial SearchScopeOption SelectedSearchScope { get; set; }
+    [ObservableProperty] public partial string SelectedLanguage { get; set; }
+    [ObservableProperty] public partial ValueLabelOption SelectedArticleType { get; set; }
+    [ObservableProperty] public partial ValueLabelOption SelectedArticleStatus { get; set; }
     [ObservableProperty] public partial bool IncludeEnglish { get; set; }
     [ObservableProperty] public partial bool IncludeFinnish { get; set; }
     [ObservableProperty] public partial bool FavoritesOnly { get; set; }
-    [ObservableProperty] public partial NullableBooleanFilterOption SelectedSourceFilter { get; set; } = null!;
+    [ObservableProperty] public partial NullableBooleanFilterOption SelectedSourceFilter { get; set; }
     [ObservableProperty] public partial double MinimumWordCount { get; set; } = double.NaN;
     [ObservableProperty] public partial double MaximumWordCount { get; set; } = double.NaN;
     [ObservableProperty] public partial DateTimeOffset? CreatedFrom { get; set; }
     [ObservableProperty] public partial DateTimeOffset? CreatedTo { get; set; }
     [ObservableProperty] public partial DateTimeOffset? UpdatedFrom { get; set; }
     [ObservableProperty] public partial DateTimeOffset? UpdatedTo { get; set; }
-    [ObservableProperty] public partial NullableBooleanFilterOption SelectedArchivedFilter { get; set; } = null!;
-    [ObservableProperty] public partial NullableBooleanFilterOption SelectedSampleFilter { get; set; } = null!;
+    [ObservableProperty] public partial NullableBooleanFilterOption SelectedArchivedFilter { get; set; }
+    [ObservableProperty] public partial NullableBooleanFilterOption SelectedSampleFilter { get; set; }
     [ObservableProperty] public partial bool IncludeSubtopics { get; set; }
     [ObservableProperty] public partial int PageNumber { get; set; } = 1;
     [ObservableProperty] public partial int PageSize { get; set; } = 50;
@@ -201,7 +206,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
         _loadingEnabled = true;
         NotifyScopeProperties();
         NotifyFilterState();
-        await LoadAsync(preferredArticleId);
+        await LoadAsync(preferredArticleId, CancellationToken.None);
     }
 
     public void RestoreFilterState(WindowLayoutState state)
@@ -242,9 +247,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(state);
         state.SearchScope = SelectedSearchScope.Kind;
-        state.SelectedLanguageCode = SelectedLanguage == Languages[1]
-            ? "en"
-            : SelectedLanguage == Languages[2] ? "fi" : null;
+        state.SelectedLanguageCode = GetSelectedLanguageCode();
         state.IncludeEnglish = IncludeEnglish;
         state.IncludeFinnish = IncludeFinnish;
         state.ArticleType = SelectedArticleType.Value;
@@ -285,7 +288,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
         NotifyFilterState();
         if (_loadingEnabled)
         {
-            await LoadAsync(preferredArticleId);
+            await LoadAsync(preferredArticleId, CancellationToken.None);
         }
     }
 
@@ -297,7 +300,10 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
         }
 
         var generation = ++_loadGeneration;
-        _loadCancellation?.Cancel();
+        if (_loadCancellation is not null)
+        {
+            await _loadCancellation.CancelAsync();
+        }
         _loadCancellation?.Dispose();
         _loadCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var token = _loadCancellation.Token;
@@ -343,11 +349,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
-        }
-        catch (Exception exception)
-        {
-            _logger.LogError(exception, "Could not query articles");
-            throw;
+            // A newer query superseded this result.
         }
         finally
         {
@@ -477,7 +479,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
         PageNumber = 1;
         _suppressReload = false;
         NotifyFilterState();
-        await LoadAsync(SelectedArticle?.Id);
+        await LoadAsync(SelectedArticle?.Id, CancellationToken.None);
     }
 
     partial void OnSelectedArticleChanged(ArticleRowViewModel? value)
@@ -572,7 +574,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
         PageNumber = 1;
         _suppressReload = false;
         NotifyFilterState();
-        await LoadAsync();
+        await LoadAsync(cancellationToken: CancellationToken.None);
     }
 
     [RelayCommand]
@@ -597,20 +599,20 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
             SortDirection = field == ArticleSortField.Updated ? SortDirection.Descending : SortDirection.Ascending;
         }
         PageNumber = 1;
-        await LoadAsync(SelectedArticle?.Id);
+        await LoadAsync(SelectedArticle?.Id, CancellationToken.None);
     }
 
     [RelayCommand(CanExecute = nameof(CanGoPrevious))]
-    private async Task FirstPageAsync() { PageNumber = 1; await LoadAsync(); }
+    private async Task FirstPageAsync() { PageNumber = 1; await LoadAsync(cancellationToken: CancellationToken.None); }
 
     [RelayCommand(CanExecute = nameof(CanGoPrevious))]
-    private async Task PreviousPageAsync() { PageNumber--; await LoadAsync(); }
+    private async Task PreviousPageAsync() { PageNumber--; await LoadAsync(cancellationToken: CancellationToken.None); }
 
     [RelayCommand(CanExecute = nameof(CanGoNext))]
-    private async Task NextPageAsync() { PageNumber++; await LoadAsync(); }
+    private async Task NextPageAsync() { PageNumber++; await LoadAsync(cancellationToken: CancellationToken.None); }
 
     [RelayCommand(CanExecute = nameof(CanGoNext))]
-    private async Task LastPageAsync() { PageNumber = TotalPages; await LoadAsync(); }
+    private async Task LastPageAsync() { PageNumber = TotalPages; await LoadAsync(cancellationToken: CancellationToken.None); }
 
     private async Task DebouncedSearchAsync(CancellationToken cancellationToken)
     {
@@ -622,6 +624,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
+            // A newer search term superseded this debounce operation.
         }
         catch (Exception exception)
         {
@@ -643,7 +646,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
         try
         {
             PageNumber = 1;
-            await LoadAsync();
+            await LoadAsync(cancellationToken: CancellationToken.None);
         }
         catch (Exception exception)
         {
@@ -654,7 +657,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
     private async Task NotifyArticleSelectedAsync(ArticleRowViewModel? article)
     {
         var requestVersion = Interlocked.Increment(ref _selectionNotificationVersion);
-        await _selectionNotificationGate.WaitAsync();
+        await _selectionNotificationGate.WaitAsync(CancellationToken.None);
         try
         {
             if (requestVersion == Volatile.Read(ref _selectionNotificationVersion)
@@ -686,9 +689,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
         var effectiveScope = searchKind == ArticleSearchScopeKind.EntireLibrary
             ? LibraryScopeKind.AllArticles
             : Scope?.Scope ?? LibraryScopeKind.AllArticles;
-        long? topicId = searchKind == ArticleSearchScopeKind.EntireLibrary
-            ? null
-            : Scope?.Scope == LibraryScopeKind.Topic ? Scope.Id : null;
+        var topicId = GetTopicId(searchKind);
         var includeDescendants = searchKind switch
         {
             ArticleSearchScopeKind.CurrentTopic => false,
@@ -721,7 +722,7 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
             PageSize);
     }
 
-    private IReadOnlyList<string> GetLanguageCodes()
+    private List<string> GetLanguageCodes()
     {
         if (SelectedLanguage == Languages[1]) return ["en"];
         if (SelectedLanguage == Languages[2]) return ["fi"];
@@ -774,9 +775,35 @@ public sealed partial class ArticleBrowserViewModel : ObservableObject
         ? null
         : value.Value.Date.AddDays(1).AddTicks(-1).ToUniversalTime();
 
-    private string GetSortGlyph(ArticleSortField field) => SortField != field
-        ? string.Empty
-        : SortDirection == SortDirection.Ascending ? "\uE70E" : "\uE70D";
+    private string GetSortGlyph(ArticleSortField field)
+    {
+        if (SortField != field)
+        {
+            return string.Empty;
+        }
+
+        return SortDirection == SortDirection.Ascending ? "\uE70E" : "\uE70D";
+    }
+
+    private string? GetSelectedLanguageCode()
+    {
+        if (SelectedLanguage == Languages[1])
+        {
+            return "en";
+        }
+
+        return SelectedLanguage == Languages[2] ? "fi" : null;
+    }
+
+    private long? GetTopicId(ArticleSearchScopeKind searchKind)
+    {
+        if (searchKind == ArticleSearchScopeKind.EntireLibrary)
+        {
+            return null;
+        }
+
+        return Scope?.Scope == LibraryScopeKind.Topic ? Scope.Id : null;
+    }
 
     private void NotifyScopeProperties()
     {

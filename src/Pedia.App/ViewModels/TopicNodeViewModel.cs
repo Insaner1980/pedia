@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Pedia.Models;
 
@@ -6,6 +7,10 @@ namespace Pedia.ViewModels;
 
 public sealed partial class TopicNodeViewModel : ObservableObject
 {
+    [SuppressMessage(
+        "Maintainability",
+        "S107",
+        Justification = "The immutable topic node constructor mirrors the complete topic projection.")]
     public TopicNodeViewModel(
         long id,
         long? parentId,

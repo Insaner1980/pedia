@@ -1,7 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.Sqlite;
 
 namespace Pedia.Core.Search;
 
+[SuppressMessage(
+    "Maintainability",
+    "S1192",
+    Justification = "SQLite parameter names intentionally match the placeholders in their SQL statements.")]
 internal static class SearchDocumentStore
 {
     public static async Task ReindexArticleAsync(
@@ -54,12 +59,14 @@ internal static class SearchDocumentStore
             return;
         }
 
-        var title = reader.GetString(0);
-        var subtitle = reader.GetString(1);
-        var summary = reader.GetString(2);
-        var sectionText = reader.GetString(3);
-        var sourceText = reader.GetString(4);
-        var notes = reader.GetString(5);
+        var content = new SearchDocumentContent(
+            articleId,
+            reader.GetString(0),
+            reader.GetString(1),
+            reader.GetString(2),
+            reader.GetString(3),
+            reader.GetString(4),
+            reader.GetString(5));
         await reader.DisposeAsync().ConfigureAwait(false);
 
         await using (var document = connection.CreateCommand())
@@ -71,7 +78,7 @@ internal static class SearchDocumentStore
                 VALUES (
                     $articleId, $title, $subtitle, $summary, $sectionText, $sourceText, $notes);
                 """;
-            AddDocumentParameters(document, articleId, title, subtitle, summary, sectionText, sourceText, notes);
+            AddDocumentParameters(document, content);
             await document.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
 
@@ -84,7 +91,7 @@ internal static class SearchDocumentStore
                 VALUES (
                     $articleId, $articleId, $title, $subtitle, $summary, $sectionText, $sourceText, $notes);
                 """;
-            AddDocumentParameters(index, articleId, title, subtitle, summary, sectionText, sourceText, notes);
+            AddDocumentParameters(index, content);
             await index.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         }
     }
@@ -112,22 +119,23 @@ internal static class SearchDocumentStore
         }
     }
 
-    private static void AddDocumentParameters(
-        SqliteCommand command,
-        long articleId,
-        string title,
-        string subtitle,
-        string summary,
-        string sectionText,
-        string sourceText,
-        string notes)
+    private static void AddDocumentParameters(SqliteCommand command, SearchDocumentContent content)
     {
-        command.Parameters.AddWithValue("$articleId", articleId);
-        command.Parameters.AddWithValue("$title", title);
-        command.Parameters.AddWithValue("$subtitle", subtitle);
-        command.Parameters.AddWithValue("$summary", summary);
-        command.Parameters.AddWithValue("$sectionText", sectionText);
-        command.Parameters.AddWithValue("$sourceText", sourceText);
-        command.Parameters.AddWithValue("$notes", notes);
+        command.Parameters.AddWithValue("$articleId", content.ArticleId);
+        command.Parameters.AddWithValue("$title", content.Title);
+        command.Parameters.AddWithValue("$subtitle", content.Subtitle);
+        command.Parameters.AddWithValue("$summary", content.Summary);
+        command.Parameters.AddWithValue("$sectionText", content.SectionText);
+        command.Parameters.AddWithValue("$sourceText", content.SourceText);
+        command.Parameters.AddWithValue("$notes", content.Notes);
     }
+
+    private sealed record SearchDocumentContent(
+        long ArticleId,
+        string Title,
+        string Subtitle,
+        string Summary,
+        string SectionText,
+        string SourceText,
+        string Notes);
 }

@@ -15,7 +15,7 @@ public sealed class ExportServiceTests
         var service = new DocumentExportService(clock);
 
         var json = service.SerializePediaJson(document);
-        var restored = service.DeserializePediaJson(json);
+        var restored = DocumentExportService.DeserializePediaJson(json);
 
         Assert.Contains("\"format\": \"pedia-document\"", json);
         Assert.Contains("\"version\": 1", json);
@@ -45,10 +45,9 @@ public sealed class ExportServiceTests
     [Fact]
     public void Unsupported_Pedia_json_version_is_rejected()
     {
-        var service = new DocumentExportService();
         const string json = """{"format":"pedia-document","version":99,"exportedAtUtc":"2026-08-12T00:00:00Z","document":{"title":"x","leadBlocks":[],"sections":[]}}""";
 
-        Assert.Throws<InvalidDataException>(() => service.DeserializePediaJson(json));
+        Assert.Throws<InvalidDataException>(() => DocumentExportService.DeserializePediaJson(json));
     }
 
     [Fact]
@@ -58,7 +57,7 @@ public sealed class ExportServiceTests
         var service = new DocumentExportService(new FixedClock(DateTimeOffset.UnixEpoch));
 
         var json = service.SerializePediaJson(article);
-        var restored = service.DeserializePediaArticleJson(json);
+        var restored = DocumentExportService.DeserializePediaArticleJson(json);
 
         Assert.Contains("\"kind\": \"article\"", json);
         Assert.Equal(article.Title, restored.Title);
@@ -73,10 +72,9 @@ public sealed class ExportServiceTests
     public void Article_text_and_Markdown_exports_include_metadata_sections_and_sources()
     {
         var article = SampleArticle();
-        var service = new DocumentExportService(new FixedClock(DateTimeOffset.UnixEpoch));
 
-        var text = service.SerializePlainText(article);
-        var markdown = service.SerializeMarkdown(article);
+        var text = DocumentExportService.SerializePlainText(article);
+        var markdown = DocumentExportService.SerializeMarkdown(article);
 
         Assert.Contains("A summary", text);
         Assert.Contains("Language: fi", text);

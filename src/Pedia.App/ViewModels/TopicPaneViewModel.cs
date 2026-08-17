@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -63,6 +64,10 @@ public sealed partial class TopicPaneViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(DeleteTopicCommand))]
     public partial bool IsSelectionPending { get; private set; }
 
+    [SuppressMessage(
+        "Performance",
+        "S2365",
+        Justification = "The property intentionally returns a point-in-time flattened snapshot of the mutable topic tree.")]
     public IReadOnlyList<TopicNodeViewModel> UserTopics => Flatten(RootNodes.Where(node => !node.IsSmart)).ToArray();
 
     public bool ContainsTopic(long topicId) => ContainsTopic(_topicData, topicId);

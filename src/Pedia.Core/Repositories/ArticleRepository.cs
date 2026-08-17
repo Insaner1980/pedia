@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.Sqlite;
 using Pedia.Core.Data;
 using Pedia.Core.Models;
@@ -5,6 +6,10 @@ using Pedia.Core.Search;
 
 namespace Pedia.Core.Repositories;
 
+[SuppressMessage(
+    "Maintainability",
+    "S1192",
+    Justification = "SQLite parameter names intentionally match the placeholders in their SQL statements.")]
 public sealed class ArticleRepository
 {
     private readonly SqliteConnectionFactory _connections;
@@ -108,18 +113,18 @@ public sealed class ArticleRepository
                 ? new ArticleHeader(
                     reader.GetInt64(0),
                     reader.GetString(1),
-                    reader.IsDBNull(2) ? null : reader.GetString(2),
-                    reader.IsDBNull(3) ? null : reader.GetString(3),
+                    ReadNullableString(reader, 2),
+                    ReadNullableString(reader, 3),
                     reader.GetString(4),
                     reader.GetString(5),
                     reader.GetString(6),
-                    reader.IsDBNull(7) ? null : reader.GetString(7),
+                    ReadNullableString(reader, 7),
                     reader.GetBoolean(8),
                     reader.GetInt32(9),
                     reader.GetBoolean(10),
                     DatabaseValue.ReadDate(reader.GetString(11)),
                     DatabaseValue.ReadDate(reader.GetString(12)),
-                    reader.IsDBNull(13) ? null : DatabaseValue.ReadDate(reader.GetString(13)))
+                    ReadNullableDate(reader, 13))
                 : null;
         }
 
@@ -278,7 +283,7 @@ public sealed class ArticleRepository
     {
         var articles = NormalizeIds(articleIds, nameof(articleIds));
         var topics = NormalizeIds(topicIds, nameof(topicIds));
-        if (articles.Count == 0 || topics.Count == 0)
+        if (articles.Length == 0 || topics.Length == 0)
         {
             return;
         }
@@ -325,7 +330,7 @@ public sealed class ArticleRepository
         CancellationToken cancellationToken = default)
     {
         var articles = NormalizeIds(articleIds, nameof(articleIds));
-        if (articles.Count == 0)
+        if (articles.Length == 0)
         {
             return;
         }
@@ -366,7 +371,7 @@ public sealed class ArticleRepository
         {
             throw new ArgumentException("The article status is not supported.", nameof(status));
         }
-        if (articles.Count == 0)
+        if (articles.Length == 0)
         {
             return;
         }
@@ -399,7 +404,7 @@ public sealed class ArticleRepository
         CancellationToken cancellationToken = default)
     {
         var articles = NormalizeIds(articleIds, nameof(articleIds));
-        if (articles.Count == 0)
+        if (articles.Length == 0)
         {
             return;
         }
@@ -653,10 +658,7 @@ public sealed class ArticleRepository
         var sections = (draft.Sections ?? [])
             .Select(section =>
             {
-                if (section.HeadingLevel is < 1 or > 3)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(draft), "Heading levels must be between 1 and 3.");
-                }
+                ValidateHeadingLevel(section.HeadingLevel);
 
                 return section with
                 {
@@ -684,7 +686,17 @@ public sealed class ArticleRepository
             topics);
     }
 
-    private static IReadOnlyList<ArticleTopicDraft> NormalizeTopicAssignments(
+    private static void ValidateHeadingLevel(int headingLevel)
+    {
+        if (headingLevel is < 1 or > 3)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(headingLevel),
+                "Heading levels must be between 1 and 3.");
+        }
+    }
+
+    private static ArticleTopicDraft[] NormalizeTopicAssignments(
         IReadOnlyList<ArticleTopicDraft> assignments)
     {
         ArgumentNullException.ThrowIfNull(assignments);
@@ -853,7 +865,7 @@ public sealed class ArticleRepository
         {
             sections.Add(new ArticleSection(
                 reader.GetInt64(0),
-                reader.IsDBNull(1) ? null : reader.GetString(1),
+                ReadNullableString(reader, 1),
                 reader.GetInt32(2),
                 reader.GetString(3),
                 reader.GetInt32(4)));
@@ -883,15 +895,15 @@ public sealed class ArticleRepository
             sources.Add(new ArticleSource(
                 reader.GetInt64(0),
                 reader.GetString(1),
-                reader.IsDBNull(2) ? null : reader.GetString(2),
-                reader.IsDBNull(3) ? null : reader.GetString(3),
-                reader.IsDBNull(4) ? null : reader.GetString(4),
-                reader.IsDBNull(5) ? null : reader.GetString(5),
-                reader.IsDBNull(6) ? null : reader.GetString(6),
-                reader.IsDBNull(7) ? null : reader.GetString(7),
-                reader.IsDBNull(8) ? null : DatabaseValue.ReadDate(reader.GetString(8)),
-                reader.IsDBNull(9) ? null : DatabaseValue.ReadDate(reader.GetString(9)),
-                reader.IsDBNull(10) ? null : reader.GetString(10),
+                ReadNullableString(reader, 2),
+                ReadNullableString(reader, 3),
+                ReadNullableString(reader, 4),
+                ReadNullableString(reader, 5),
+                ReadNullableString(reader, 6),
+                ReadNullableString(reader, 7),
+                ReadNullableDate(reader, 8),
+                ReadNullableDate(reader, 9),
+                ReadNullableString(reader, 10),
                 reader.GetInt32(11)));
         }
 
@@ -984,9 +996,9 @@ public sealed class ArticleRepository
         }
     }
 
-    private static IReadOnlyList<long> NormalizeIds(IReadOnlyList<long> ids, string parameterName)
+    private static long[] NormalizeIds(IReadOnlyList<long> ids, string parameterName)
     {
-        ArgumentNullException.ThrowIfNull(ids, parameterName);
+        ArgumentNullException.ThrowIfNull(ids);
         if (ids.Any(id => id <= 0))
         {
             throw new ArgumentOutOfRangeException(parameterName, "Identifiers must be positive.");
@@ -994,6 +1006,12 @@ public sealed class ArticleRepository
 
         return ids.Distinct().ToArray();
     }
+
+    private static string? ReadNullableString(SqliteDataReader reader, int ordinal) =>
+        reader.IsDBNull(ordinal) ? null : reader.GetString(ordinal);
+
+    private static DateTimeOffset? ReadNullableDate(SqliteDataReader reader, int ordinal) =>
+        reader.IsDBNull(ordinal) ? null : DatabaseValue.ReadDate(reader.GetString(ordinal));
 
     private static async Task TouchArticleAsync(
         SqliteConnection connection,

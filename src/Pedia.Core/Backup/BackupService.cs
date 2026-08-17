@@ -37,10 +37,7 @@ public sealed class BackupService
             throw new ArgumentOutOfRangeException(nameof(requiredSchemaVersion));
         }
 
-        if (maximumDatabaseBytes < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maximumDatabaseBytes));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(maximumDatabaseBytes, 1);
 
         _databasePath = Path.GetFullPath(databasePath);
         _clock = clock ?? SystemClock.Instance;
@@ -96,7 +93,8 @@ public sealed class BackupService
         cancellationToken.ThrowIfCancellationRequested();
 
         var fileName = Path.GetFileName(requestedPath);
-        for (var collisionNumber = 1; ; collisionNumber++)
+        var collisionNumber = 1;
+        while (true)
         {
             var candidate = FileNameUtilities.GetCollisionPath(outputDirectory, fileName, collisionNumber);
             try
@@ -107,6 +105,7 @@ public sealed class BackupService
             catch (IOException) when (File.Exists(candidate))
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                collisionNumber++;
             }
         }
     }
@@ -209,7 +208,7 @@ public sealed class BackupService
         cancellationToken.ThrowIfCancellationRequested();
     }
 
-    private async Task WriteArchiveAsync(
+    private static async Task WriteArchiveAsync(
         string archivePath,
         string snapshotPath,
         BackupManifest manifest,
@@ -579,7 +578,12 @@ public sealed class BackupService
         var utc = value.ToUniversalTime();
         var minimum = new DateTimeOffset(1980, 1, 1, 0, 0, 0, TimeSpan.Zero);
         var maximum = new DateTimeOffset(2107, 12, 31, 23, 59, 58, TimeSpan.Zero);
-        return utc < minimum ? minimum : utc > maximum ? maximum : utc;
+        if (utc < minimum)
+        {
+            return minimum;
+        }
+
+        return utc > maximum ? maximum : utc;
     }
 
     private sealed record DatabaseInspection(

@@ -51,15 +51,7 @@ public sealed class SettingsService(ILogger<SettingsService> logger) : ISettings
 
     public async Task SaveAsync(CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await new CoreSettingsService(SettingsPath).SaveAsync(ToCore(Current), cancellationToken);
-        }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
-        {
-            logger.LogError(exception, "Could not save Pedia settings to {SettingsPath}", SettingsPath);
-            throw;
-        }
+        await new CoreSettingsService(SettingsPath).SaveAsync(ToCore(Current), cancellationToken);
     }
 
     private static PediaSettings FromCore(CoreAppSettings settings)
@@ -202,7 +194,7 @@ public sealed class SettingsService(ILogger<SettingsService> logger) : ISettings
         return tags.ToArray();
     }
 
-    private static void AddTag<T>(ICollection<string> tags, string key, T? value)
+    private static void AddTag<T>(List<string> tags, string key, T? value)
     {
         if (value is not null)
         {
